@@ -1,0 +1,30 @@
+# create database for goldenrodgames
+import datetime
+import config
+
+def create(conn, cursor):
+    cursor.execute("""CREATE TABLE "users" ("twitchname" VARCHAR PRIMARY KEY  NOT NULL ,"balance" INTEGER NOT NULL  DEFAULT (0) ,"last_activity" DATETIME DEFAULT (CURRENT_DATE) ,"last_game" INTEGER DEFAULT (0) , "handouts" INTEGER NOT NULL  DEFAULT 0, "coins_won" INTEGER NOT NULL  DEFAULT 0, "coins_lost" INTEGER NOT NULL  DEFAULT 0, "highest_handout" INTEGER NOT NULL  DEFAULT 0, "contests_won" INTEGER NOT NULL  DEFAULT 0, "highest_balance" INTEGER NOT NULL  DEFAULT 0, "handout_ban" INTEGER NOT NULL  DEFAULT 0, "coin_profit" INTEGER NOT NULL  DEFAULT 0)""")
+    cursor.execute("""CREATE TABLE "coinflips" ("twitchname" VARCHAR NOT NULL ,"amount" INTEGER NOT NULL  DEFAULT (0) ,"yoloflip" BOOL NOT NULL  DEFAULT (0) ,"winner" BOOL NOT NULL ,"whenHappened" DATETIME)""")
+    cursor.execute("""CREATE TABLE "slots" ("twitchname" VARCHAR NOT NULL , "reelOne" VARCHAR NOT NULL , "reelTwo" VARCHAR NOT NULL , "reelThree" VARCHAR NOT NULL , "winner" BOOL NOT NULL , "balChange" INTEGER NOT NULL , "whenHappened" DATETIME NOT NULL )""")
+    cursor.execute("""CREATE TABLE "donations" ("fromPlayer" VARCHAR NOT NULL , "toPlayer" VARCHAR NOT NULL , "amount" INTEGER NOT NULL , "whenHappened" DATETIME NOT NULL )""")
+    cursor.execute("""CREATE TABLE "taxes" ("twitchname" VARCHAR NOT NULL , "amount" INTEGER NOT NULL , "whenHappened" DATETIME NOT NULL )""")
+    cursor.execute("""CREATE TABLE "charity" ("twitchname" VARCHAR NOT NULL , "amount" INTEGER NOT NULL , "whenHappened" DATETIME NOT NULL )""")
+    cursor.execute("""CREATE TABLE "slotspool" ("slotspool" INTEGER NOT NULL  DEFAULT 50, "last_change" DATETIME NOT NULL , "last_winner" DATETIME NOT NULL )""")
+    cursor.execute("""CREATE TABLE "alts" ("twitchname" VARCHAR PRIMARY KEY  NOT NULL , "whenHappened" DATETIME)""")
+    cursor.execute("""CREATE TABLE "contestwins" ("twitchname" VARCHAR NOT NULL , "gameid" VARCHAR NOT NULL , "answer" VARCHAR NOT NULL , "reward" INTEGER NOT NULL , "whenHappened" DATETIME NOT NULL )""")
+    cursor.execute("""CREATE TABLE "trivia_questions" ("id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "question" TEXT NOT NULL  UNIQUE , "difficulty" INTEGER NOT NULL  DEFAULT 1, "whenAdded" DATETIME NOT NULL , "question_grouping" INTEGER NOT NULL  DEFAULT 0, "used_in_cycle" BOOL NOT NULL  DEFAULT 0)""")
+    cursor.execute("""CREATE TABLE "trivia_answers" ("question_id" INTEGER NOT NULL , "answer" TEXT NOT NULL )""")
+    cursor.execute("""CREATE TABLE "handouts" ("twitchname" VARCHAR NOT NULL ,"amount" INTEGER NOT NULL  DEFAULT (0) ,"whenHappened" TIMESTAMP DEFAULT (null) )""")
+    cursor.execute("""CREATE TABLE "hangman_words" ("id" INTEGER PRIMARY KEY AUTOINCREMENT , "word" VARCHAR NOT NULL , "whenAdded" DATETIME NOT NULL , "used_in_cycle" BOOL NOT NULL  DEFAULT 0)""")
+    cursor.execute("""CREATE TABLE "trivia_winners" ("twitchname" VARCHAR NOT NULL , "question_id" INTEGER NOT NULL , "timeTaken" INTEGER NOT NULL , "reward" INTEGER NOT NULL , "whenHappened" DATETIME NOT NULL )""")
+    cursor.execute("""CREATE INDEX "trivia_winners_lookup" ON "trivia_winners" ("twitchname" ASC, "question_id" ASC)""")
+    cursor.execute("""CREATE TABLE "duel_requests" ("from_user" VARCHAR NOT NULL , "to_user" VARCHAR NOT NULL , "amount" INTEGER NOT NULL , "expiry" INTEGER NOT NULL , "whenHappened" DATETIME NOT NULL )""")
+    cursor.execute("""CREATE TABLE "duel_results" ("from_user" VARCHAR NOT NULL , "to_user" VARCHAR NOT NULL , "roll1" INTEGER NOT NULL , "roll2" INTEGER NOT NULL , "amount" INTEGER NOT NULL , "winner" VARCHAR, "whenHappened" DATETIME NOT NULL )""")
+    cursor.execute("""CREATE TABLE "channels" ("channel" VARCHAR PRIMARY KEY  NOT NULL ,"commandsEnabled" BOOL NOT NULL  DEFAULT (1) ,"lastChange" DATETIME NOT NULL ,"joinIfLive" BOOL NOT NULL  DEFAULT (1) )""")
+    conn.commit()
+    cursor.execute("""INSERT INTO slotspool (slotspool, last_change, last_winner) VALUES(?, ?, ?)""", (100, datetime.datetime.now(), datetime.datetime.now()))
+    cursor.execute("""INSERT INTO channels (channel, commandsEnabled, lastChange, joinIfLive) VALUES(?, ?, ?, ?)""", (config.botNick, False, datetime.datetime.now(), False))
+    cursor.execute("""INSERT INTO trivia_questions (question, difficulty, whenAdded, question_grouping, used_in_cycle) VALUES(?, ?, ?, ?, ?)""", ("Sample question", 0, datetime.datetime.now(), 1, 0))
+    cursor.execute("""INSERT INTO trivia_answers (question_id, answer) VALUES(?, ?)""", (1, "Sample answer"))
+    cursor.execute("""INSERT INTO hangman_words (word, whenAdded, used_in_cycle) VALUES(?, ?, ?)""", ("test", datetime.datetime.now(), 0))
+    conn.commit()
