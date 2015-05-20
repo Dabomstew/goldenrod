@@ -64,7 +64,7 @@ def execute(parser, bot, user, args):
         else:
             handoutMessages = ["You irresponsible gambler, how dare you waste my generosity. But I feel obligated to get you back on your feet again, so here's %d %s." % (handout, currencyNow)]
         
-        bot.channelMsg("%s -> %s" % (user, random.choice(handoutChoices)))
+        bot.channelMsg("%s -> %s" % (user, random.choice(handoutMessages)))
     else:
         if config.showCooldowns:
             bot.channelMsg("%s -> On cooldown. (%d secs)" % (user, canPlay))
