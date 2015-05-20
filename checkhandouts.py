@@ -1,3 +1,5 @@
+# check the statistical averages for !handout
+
 import random
 
 handoutbal = 0

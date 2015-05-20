@@ -5,7 +5,8 @@ import math
 
 def execute(parser, bot, user, args):
     argslow = args.lower().strip()
-    saidPlease = argslow.startswith("please") or argslow.startswith("pls") or argslow.startswith("plz")
+    # saidPlease = argslow.startswith("please") or argslow.startswith("pls") or argslow.startswith("plz")
+    saidPlease = False # lol
     userData = bot.getUserDetails(user)
     
     timeNow = int(time.time())
