@@ -10,7 +10,6 @@ import os.path
 class CommandParser:
 
     def __init__(self):
-        self.booleanValues = {}
         self.commandMethods = {}
         self.allImportedModules = {}
         self.importedModuleMTimes = {}
@@ -41,43 +40,7 @@ class CommandParser:
     
     def saveCommands(self):
         # do nothing
-        return
-    
-    def loadBooleans(self):
-        bools = open('booleans.txt', 'r')
-        self.booleanValues = {}
-        ln = bools.readline()
-        while(ln != ""):
-            if ln.strip() != "":
-                blparts = ln.split(' ', 1)
-                self.booleanValues[blparts[0]] = (blparts[1].strip() == "True")
-            ln = bools.readline()
-        bools.close()
-        
-    def saveBooleans(self):
-        bools = open('booleans.txt', 'w')
-        for boolName in self.booleanValues:
-            bools.write("%s %s\n" % (boolName, "True" if self.booleanValues[boolName] else "False"))
-        bools.close()
-    
-    def getBoolean(self, name):
-        trueName = name.strip()
-        if trueName == "" or trueName == "None":
-            return True
-        else:
-            if trueName not in self.booleanValues:
-                self.booleanValues[trueName] = False
-                self.saveBooleans()
-            return self.booleanValues[trueName]
-    
-    def setBoolean(self, name, value):
-        trueName = name.strip()
-        if trueName == "" or trueName == "None":
-            return
-        else:
-            self.booleanValues[trueName] = value
-            self.saveBooleans()
-            
+        return  
     
     def parse(self, bot, user, command, args):
         # parse it lol

@@ -8,14 +8,12 @@ from twisted.python import log
 import datetime, time, sys, threading
 import commandparser
 import messagequeue
-import centralmessagelimiter
 import contestmanager
 import config
 import random
 import sqlite3
 import channelmanager
 
-centralMessageLimiter = None
 commandParser = None
 channelManager = None
 channelInstances = {}
@@ -343,7 +341,6 @@ if __name__ == '__main__':
     log.startLogging(open('./logs/%d.log' % (time.time()), 'w'))
     commandParser = commandparser.CommandParser()
     commandParser.loadCommands()
-    commandParser.loadBooleans()
     reactor.commandParser = commandParser
     
     connectToTwitch(config.botNick, commandParser, 0)
