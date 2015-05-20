@@ -26,10 +26,7 @@ def execute(parser, bot, user, args):
     else:
         topPlayers = bot.execQuerySelectMultiple("SELECT * FROM users WHERE twitchname != ? ORDER BY handouts DESC LIMIT %d" % topwhat, (config.botOwner,))
         finalMessage = "%s -> The top %d beggars are: " % (user, topwhat)
-        for player in topPlayers:
-            finalMessage = "%s%s (%d handouts), " % (finalMessage, player["twitchname"], player["handouts"])
-        
-        finalMessage = finalMessage[:-2]
+        finalMessage += ", ".join("%s (%d handouts)" % (player["twitchname"], player["handouts"]) for player in topPlayers)
         bot.channelMsg(finalMessage.encode("utf-8"))
     
 def requiredPerm():

@@ -164,7 +164,7 @@ class GoldenrodNostalgiaB(irc.IRCClient):
         
     def modeChanged(self, user, channel, set, modes, args):
         # do something (change mod status?)
-        """Kappa"""
+        pass
 
     def privmsg(self, user, channel, msg):
         """This will get called when the bot receives a message."""
@@ -230,7 +230,7 @@ def connectToTwitch(startChannel, commandParser, waitTimeout):
     f = GoldenrodFactory(startChannel, commandParser, waitTimeout)
     # connect factory to this host and port
     twitchServers = ["192.16.64.11", "192.16.64.144", "192.16.64.145", "192.16.64.146", "192.16.64.152", "192.16.64.155"]
-    myServer = twitchServers[random.randint(0, len(twitchServers)-1)]
+    myServer = random.choice(twitchServers)
     print "picked", myServer
     reactor.connectTCP(myServer, 6667, f)
     

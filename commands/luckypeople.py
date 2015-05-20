@@ -5,12 +5,9 @@ import datetime, time
 def execute(parser, bot, user, args):
     topwhat = 5
         
-    topPlayers = bot.execQuerySelectMultiple("SELECT * FROM handouts ORDER BY amount DESC LIMIT %d" % topwhat)
+    topHandouts = bot.execQuerySelectMultiple("SELECT * FROM handouts ORDER BY amount DESC LIMIT %d" % topwhat)
     finalMessage = "%s -> The luckiest %d handouts are: " % (user, topwhat)
-    for player in topPlayers:
-        finalMessage = "%s%s (%d %s), " % (finalMessage, player["twitchname"], player["amount"], config.currencyName if (player["amount"] == 1) else config.currencyPlural)
-    
-    finalMessage = finalMessage[:-2]
+    finalMessage += ", ".join("%s (%d %s)" % (handout["twitchname"], handout["amount"], config.currencyName if (handout["amount"] == 1) else config.currencyPlural) for handout in topHandouts)
     bot.channelMsg(finalMessage.encode("utf-8"))
     
 def requiredPerm():

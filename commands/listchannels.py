@@ -6,9 +6,8 @@ def execute(parser, bot, user, args):
         return
     from goldenrod import channelInstances
     channelsIamIn = "I am in: "
-    for channel in channelInstances:
-        channelsIamIn += "%s, " % channel
-    bot.channelMsg("%s -> %s" % (user, channelsIamIn[:-2]))
+    channelsIamIn += ", ".join(channel for channel in channelInstances)
+    bot.channelMsg("%s -> %s" % (user, channelsIamIn))
     
 def requiredPerm():
     return "owner"

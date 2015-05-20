@@ -26,10 +26,7 @@ def execute(parser, bot, user, args):
     else:
         topPlayers = bot.execQuerySelectMultiple("SELECT * FROM users WHERE (coins_won+coins_lost) > 0 ORDER BY (coins_won - coins_lost) DESC, (coins_won + coins_lost) ASC LIMIT %d" % topwhat)
         finalMessage = "%s -> The luckiest %d coinflippers are: " % (user, topwhat)
-        for player in topPlayers:
-            finalMessage = "%s%s (%d-%d), " % (finalMessage, player["twitchname"], player["coins_won"], player["coins_lost"])
-        
-        finalMessage = finalMessage[:-2]
+        finalMessage += ", ".join("%s (%d-%d)" % (player["twitchname"], player["coins_won"], player["coins_lost"]) for player in topPlayers)
         bot.channelMsg(finalMessage.encode("utf-8"))
     
 def requiredPerm():

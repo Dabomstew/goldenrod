@@ -24,9 +24,9 @@ def execute(parser, bot, user, args):
         gamble = 5
             
         if gamble > 0 and gamble <= userData["balance"]:
-            reelOne = slotsReelOne[random.randint(0, len(slotsReelOne)-1)]
-            reelTwo = slotsReelTwo[random.randint(0, len(slotsReelTwo)-1)]
-            reelThree = slotsReelThree[random.randint(0, len(slotsReelThree)-1)]
+            reelOne = random.choice(slotsReelOne)
+            reelTwo = random.choice(slotsReelTwo)
+            reelThree = random.choice(slotsReelThree)
             if reelOne == "7" and reelTwo == "7" and reelThree != "7":
                 trollReroll = random.randint(1, 8)
                 if trollReroll < 7:
