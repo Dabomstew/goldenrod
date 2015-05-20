@@ -20,11 +20,11 @@ def execute(parser, bot, user, args):
     
     # parse their choice
     if topwhat == 1:
-        topPlayer = bot.execQuerySelectOne("SELECT * FROM users WHERE (coins_won+coins_lost) > 0 ORDER BY (coins_won - coins_lost) DESC, (coins_won + coins_lost) ASC LIMIT 1")
+        topPlayer = bot.execQuerySelectOne("SELECT * FROM users WHERE (coins_won+coins_lost) > 0 AND twitchname != ? ORDER BY (coins_won - coins_lost) DESC, (coins_won + coins_lost) ASC LIMIT 1", (config.botOwner,))
         finalMessage = "%s -> The luckiest coinflipper is %s with %d coin wins and %d coin losses." % (user, topPlayer["twitchname"], topPlayer["coins_won"], topPlayer["coins_lost"])
         bot.channelMsg(finalMessage.encode("utf-8"))
     else:
-        topPlayers = bot.execQuerySelectMultiple("SELECT * FROM users WHERE (coins_won+coins_lost) > 0 ORDER BY (coins_won - coins_lost) DESC, (coins_won + coins_lost) ASC LIMIT %d" % topwhat)
+        topPlayers = bot.execQuerySelectMultiple("SELECT * FROM users WHERE (coins_won+coins_lost) > 0 AND twitchname != ? ORDER BY (coins_won - coins_lost) DESC, (coins_won + coins_lost) ASC LIMIT %d" % topwhat, (config.botOwner,))
         finalMessage = "%s -> The luckiest %d coinflippers are: " % (user, topwhat)
         finalMessage += ", ".join("%s (%d-%d)" % (player["twitchname"], player["coins_won"], player["coins_lost"]) for player in topPlayers)
         bot.channelMsg(finalMessage.encode("utf-8"))

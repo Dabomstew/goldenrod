@@ -18,5 +18,4 @@ def execute(parser, bot, user, args):
         bot.channelMsg("%s -> Goldenrod is currently %s." % (user, "on" if bot.commandsEnabled else "off"))
     
 def requiredPerm():
-    return "broadcaster"
-    
+    return "mod"
