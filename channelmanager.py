@@ -12,6 +12,7 @@ class ChannelManager:
     def run(self):
         # wait for reactor to boot up
         time.sleep(5.0)
+        lastOnlineList = []
         while True:
             print "channel joiner loop"
             # fetch autojoin channels
@@ -68,7 +69,7 @@ class ChannelManager:
                 # leave old channels
                 leaveChannels = []
                 for channel in channelInstances:
-                    if channel != config.botNick and channel not in autojoins:
+                    if channel != config.botNick and channel not in autojoins and channel not in lastOnlineList:
                         leaveChannels.append(channel)
                     else:
                         channelInstances[channel].contestsEnabled = (channel in enableContests)
@@ -77,6 +78,9 @@ class ChannelManager:
                     from goldenrod import leaveChannel
                     print "leaving %s" % channel
                     leaveChannel(channel, config.byeMessage)
-                
+            
+            # cycle through last online
+            lastOnlineList = autojoins
+            
             # sleep until next time
             time.sleep(60.0)
