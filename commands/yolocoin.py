@@ -32,8 +32,8 @@ def execute(parser, bot, user, args):
             queryArgs = (newBal, newProfit, timeNow, datetime.datetime.now(), newWins, newLosses, user, userData["balance"])
             bot.execQueryModify("UPDATE users SET balance = ?, coin_profit = ?, last_game = ?, last_activity = ?, coins_won = ?, coins_lost = ? WHERE twitchname = ? AND balance = ?", queryArgs)
             bot.updateHighestBalance(userData, newBal)
-            logArgs = (user, gamble, True, isWinner, datetime.datetime.now())
-            bot.execQueryModify("INSERT INTO coinflips (twitchname, amount, yoloflip, winner, whenHappened) VALUES(?, ?, ?, ?, ?)", logArgs)
+            logArgs = (user, gamble, True, isWinner, datetime.datetime.now(), bot.factory.channel)
+            bot.execQueryModify("INSERT INTO coinflips (twitchname, amount, yoloflip, winner, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?)", logArgs)
         else:
             bot.channelMsg("%s -> No %s to gamble." % (user, config.currencyPlural))
     else:

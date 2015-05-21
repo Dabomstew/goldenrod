@@ -67,8 +67,8 @@ def execute(parser, bot, user, args):
         queryArgs = (userData["balance"]+handout, timeNow, datetime.datetime.now(), newHighest, user, userData["balance"])
         bot.execQueryModify("UPDATE users SET balance = ?, last_game = ?, last_activity = ?, handouts = handouts + 1, highest_handout = ? WHERE twitchname = ? AND balance = ?", queryArgs)
         bot.updateHighestBalance(userData, userData["balance"]+handout)
-        logArgs = (user, handout, datetime.datetime.now())
-        bot.execQueryModify("INSERT INTO handouts (twitchname, amount, whenHappened) VALUES(?, ?, ?)", logArgs)
+        logArgs = (user, handout, datetime.datetime.now(), bot.factory.channel)
+        bot.execQueryModify("INSERT INTO handouts (twitchname, amount, whenHappened, channel) VALUES(?, ?, ?, ?)", logArgs)
         
         bot.channelMsg("%s -> %s" % (user, random.choice(handoutMessages)))
     else:

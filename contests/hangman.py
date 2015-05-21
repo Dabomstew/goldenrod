@@ -96,8 +96,8 @@ class Game:
                         queryArgList = (theirNewBal, user, userData["balance"])
                         self.bot.execQueryModify("UPDATE users SET balance = ?, contests_won = contests_won + 1 WHERE twitchname = ? AND balance = ?", queryArgList)
                         self.bot.updateHighestBalance(userData, theirNewBal)
-                        logArgList = (user, "hangman", self.word, prize, datetime.datetime.now())
-                        self.bot.execQueryModify("INSERT INTO contestwins (twitchname, gameid, answer, reward, whenHappened) VALUES(?, ?, ?, ?, ?)", logArgList)
+                        logArgList = (user, "hangman", self.word, prize, datetime.datetime.now(), self.bot.factory.channel)
+                        self.bot.execQueryModify("INSERT INTO contestwins (twitchname, gameid, answer, reward, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?)", logArgList)
                         self.contestmanager.contestIsDone()
                         return
                     else:

@@ -48,8 +48,8 @@ class Game:
                 queryArgList = (theirNewBal, guess[0], userData["balance"])
                 self.bot.execQueryModify("UPDATE users SET balance = ?, contests_won = contests_won + 1 WHERE twitchname = ? AND balance = ?", queryArgList)
                 self.bot.updateHighestBalance(userData, theirNewBal)
-                logArgList = (guess[0], "guessnumber", self.number, config.guessPrize, datetime.datetime.now())
-                self.bot.execQueryModify("INSERT INTO contestwins (twitchname, gameid, answer, reward, whenHappened) VALUES(?, ?, ?, ?, ?)", logArgList)
+                logArgList = (guess[0], "guessnumber", self.number, config.guessPrize, datetime.datetime.now(), self.bot.factory.channel)
+                self.bot.execQueryModify("INSERT INTO contestwins (twitchname, gameid, answer, reward, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?)", logArgList)
                 return
         self.bot.channelMsg("No-one guessed correctly, the correct answer was %d. Too bad! Let's see who was closest..." % self.number)
         closestScore = 99999999
@@ -65,6 +65,6 @@ class Game:
                     queryArgList = (theirNewBal, guess[0], userData["balance"])
                     self.bot.execQueryModify("UPDATE users SET balance = ?, contests_won = contests_won + 1 WHERE twitchname = ? AND balance = ?", queryArgList)
                     self.bot.updateHighestBalance(userData, theirNewBal)
-                    logArgList = (guess[0], "guessnumber", "%d for %d" % (guess[1], self.number), config.guessPrizeConsolation, datetime.datetime.now())
-                    self.bot.execQueryModify("INSERT INTO contestwins (twitchname, gameid, answer, reward, whenHappened) VALUES(?, ?, ?, ?, ?)", logArgList)
+                    logArgList = (guess[0], "guessnumber", "%d for %d" % (guess[1], self.number), config.guessPrizeConsolation, datetime.datetime.now(), self.bot.factory.channel)
+                    self.bot.execQueryModify("INSERT INTO contestwins (twitchname, gameid, answer, reward, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?)", logArgList)
                     return

@@ -68,8 +68,8 @@ def execute(parser, bot, user, args):
             bot.updateHighestBalance(otherUser, theirNewBal)
             outputList = (user, amount, config.currencyName if (amount == 1) else config.currencyPlural, otherUserTry, taxedAmount, config.currencyName if (taxedAmount == 1) else config.currencyPlural)
             bot.channelMsg("%s -> Donated %d %s to %s, they received %d %s." % outputList)
-            logArgs = (user, otherUserTry, amount, datetime.datetime.now())
-            bot.execQueryModify("INSERT INTO donations (fromPlayer, toPlayer, amount, whenHappened) VALUES(?, ?, ?, ?)", logArgs)
+            logArgs = (user, otherUserTry, amount, datetime.datetime.now(), bot.factory.channel)
+            bot.execQueryModify("INSERT INTO donations (fromPlayer, toPlayer, amount, whenHappened, channel) VALUES(?, ?, ?, ?, ?)", logArgs)
         else:
             bot.channelMsg("%s -> Donation failed." % user)
     

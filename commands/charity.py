@@ -28,8 +28,8 @@ def execute(parser, bot, user, args):
         bot.execQueryModify("UPDATE users SET balance = ? WHERE twitchname = ? AND balance = ?", secondArgList)
         bot.updateHighestBalance(otherUser, theirNewBal)
         bot.channelMsg("%s -> Gave %d %s to %s." % (user, amount, config.currencyName if (amount == 1) else config.currencyPlural, otherUserTry))
-        logArgs = (otherUserTry, amount, datetime.datetime.now())
-        bot.execQueryModify("INSERT INTO charity (twitchname, amount, whenHappened) VALUES(?, ?, ?)", logArgs)
+        logArgs = (otherUserTry, amount, datetime.datetime.now(), bot.factory.channel)
+        bot.execQueryModify("INSERT INTO charity (twitchname, amount, whenHappened, channel) VALUES(?, ?, ?, ?)", logArgs)
     
 def requiredPerm():
     return "owner"

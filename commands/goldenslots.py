@@ -68,8 +68,8 @@ def execute(parser, bot, user, args):
                     bot.execQueryModify("UPDATE users SET balance = ?, last_game = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", argsListTwo)
                     bot.channelMsg("%s -> %s | %s | %s - Not this time! -%d %s." % (user, reelOne, reelTwo, reelThree, gamble, config.currencyName if (gamble == 1) else config.currencyPlural))
             
-            logArgs = (user, reelOne, reelTwo, reelThree, True if (reelOne==reelTwo and reelOne==reelThree) else False, winnings, datetime.datetime.now())
-            bot.execQueryModify("INSERT INTO slots (twitchname, reelOne, reelTwo, reelThree, winner, balChange, whenHappened) VALUES(?, ?, ?, ?, ?, ?, ?)", logArgs)
+            logArgs = (user, reelOne, reelTwo, reelThree, True if (reelOne==reelTwo and reelOne==reelThree) else False, winnings, datetime.datetime.now(), bot.factory.channel)
+            bot.execQueryModify("INSERT INTO slots (twitchname, reelOne, reelTwo, reelThree, winner, balChange, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", logArgs)
         else:
             bot.channelMsg("%s -> The slots cost 5 %s to play, you don't have enough." % (user, config.currencyPlural))
     else:
