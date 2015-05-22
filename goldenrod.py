@@ -346,7 +346,7 @@ if __name__ == '__main__':
     connectToTwitch(config.botNick, commandParser, 0)
 
     # setup channel manager
-    channelManager = channelmanager.ChannelManager(cursor, lock, channelInstances)
+    channelManager = channelmanager.ChannelManager(conn, cursor, lock, channelInstances)
     cmThread = threading.Thread(target=channelManager.run)
     cmThread.daemon = True
     cmThread.start()

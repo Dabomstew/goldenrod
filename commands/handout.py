@@ -5,6 +5,21 @@ import random
 import datetime, time
 import math
 
+def thinpurgeise(str):
+    universion = str.decode('utf-8')
+    newstr = u""
+    ind = 0
+    lencheck = len(universion)
+    for c in universion:
+        cnum = ord(c)
+        if cnum >= 0x21 and cnum <= 0x7E:
+            cnum += 0xFEE0
+        elif cnum == 0x20:
+            cnum = 0x3000
+        newstr += unichr(cnum)
+        ind += 1
+    return newstr.encode('utf-8')
+    
 def execute(parser, bot, user, args):
     argslow = args.lower().strip()
     saidPlease = argslow.startswith("please") or argslow.startswith("pls") or argslow.startswith("plz")
@@ -59,7 +74,7 @@ def execute(parser, bot, user, args):
             handout = 0
             handoutMessages = ["Error 404, points not found. Perhaps next time?", "Oops, I slipped and dropped my wallet full of points so I can't help you. Try again later.", "SYSTEM used PAY DAY! SYSTEM's attack missed!"]
         elif userData["balance"] > 0:
-            handoutMessages = ["Here, take %d %s." % (handout, currencyNow), "If I give you %d %s will you leave me alone?" % (handout, currencyNow), "Fine. %d %s for you. Now shoo!" % (handout, currencyNow), "I'm actually feeling pretty generous today, so have %d %s." % (handout, currencyNow), "I-It's not like I wanted to give you %d %s or anything! B-Baka!" % (handout, currencyNow), "I present %d %s to Mr. Beggar Extraordinaire over here." % (handout, currencyNow), "I present %d %s to Ms. Beggar Extraordinaire over here." % (handout, currencyNow), "The Goldenrod Gods have spoken. Thou shalt receive %d %s." % (handout, currencyNow), "The hammer has deemed you not worthy. Here is your consolation prize of %d %s." % (handout, currencyNow), "I'll allow you to take %d %s off my hands if you promise not to tell anyone." % (handout, currencyNow), "%s grew to level %d! %s gained %d %s!" % (user, userData["handouts"]+1, user, handout, currencyNow), "Ｕｐ　Ｄｏｗｎ　Ｌｅｆｔ　Ｒｉｇｈｔ %d %s Ａ　Ｂ　Ｓｔａｒｔ　Ｓｅｌｅｃｔ" % (handout, currencyNow), "You just passed GO! Take %d %s." % (handout, currencyNow)]
+            handoutMessages = ["Here, take %d %s." % (handout, currencyNow), "If I give you %d %s will you leave me alone?" % (handout, currencyNow), "Fine. %d %s for you. Now shoo!" % (handout, currencyNow), "I'm actually feeling pretty generous today, so have %d %s." % (handout, currencyNow), "I-It's not like I wanted to give you %d %s or anything! B-Baka!" % (handout, currencyNow), "I present %d %s to Mr. Beggar Extraordinaire over here." % (handout, currencyNow), "I present %d %s to Ms. Beggar Extraordinaire over here." % (handout, currencyNow), "The Goldenrod Gods have spoken. Thou shalt receive %d %s." % (handout, currencyNow), "The hammer has deemed you not worthy. Here is your consolation prize of %d %s." % (handout, currencyNow), "I'll allow you to take %d %s off my hands if you promise not to tell anyone." % (handout, currencyNow), "%s grew to level %d! %s gained %d %s!" % (user, userData["handouts"]+1, user, handout, currencyNow), thinpurgeise("Up Down Left Right %d %s A B Start Select" % (handout, currencyNow)), "You just passed GO! Take %d %s." % (handout, currencyNow), "On coold- HEY! What's the meaning of stealing %d %s from me? Oh well, I may as well let you have them...ᴡᴀᴛᴄʜ ʏᴏᴜʀ ʙᴀᴄᴋ..." % (handout, currencyNow)]
         else:
             handoutMessages = ["You irresponsible gambler, how dare you waste my generosity. But I feel obligated to get you back on your feet again, so here's %d %s." % (handout, currencyNow), "Another yolocoiner? The line's over there... Fine, have %d %s but get out of my sight." % (handout, currencyNow)]
             
