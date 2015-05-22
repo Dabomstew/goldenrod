@@ -1,6 +1,7 @@
 botOwner = "yournamehere"
 botNick = "botnamehere"
 botOAuth = "oauthtokenhere"
+botClientID = "twitchclientidhere"
 helloMessage = "Hello! GoldenrodNostalgia is here and ready for business. (Streamer - remember you can use !goldenrodctl on/off.)"
 byeMessage = "The stream is over so I'm out for now too, see you later."
 doSayHello = True

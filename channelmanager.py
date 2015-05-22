@@ -40,7 +40,7 @@ class ChannelManager:
                 # fetch live channels
                 ajURLList = ",".join(autojoins)
                 twitchAPIUrl = "https://api.twitch.tv/kraken/streams?channel=%s" % ajURLList
-                headers = {'Accept': 'application/vnd.twitchtv.v2+json'}
+                headers = {'Accept': 'application/vnd.twitchtv.v2+json', 'Client-ID': config.botClientID}
                 liveChannels = []
                 broadcastIDs = {}
                 r = requests.get(twitchAPIUrl, headers=headers)
