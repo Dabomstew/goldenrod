@@ -95,11 +95,11 @@ class GoldenrodNostalgiaB(irc.IRCClient):
             self.createNewUser(user)
             return self.execQuerySelectOne("SELECT * FROM users WHERE twitchname = ?", (user,))
         else:
-            self.execQueryModify("UPDATE users SET last_activity = ? WHERE twitchname = ?", (datetime.datetime.now(), user))
+            self.execQueryModify("UPDATE users SET last_activity = ? WHERE twitchname = ?", (int(time.time()), user))
             return userData
     
     def createNewUser(self, user):
-        self.execQueryModify("INSERT INTO users (twitchname, balance, last_activity, highest_balance) VALUES(?, ?, ?, ?)", (user, config.startingBalance, datetime.datetime.now(), config.startingBalance))
+        self.execQueryModify("INSERT INTO users (twitchname, balance, last_activity, highest_balance) VALUES(?, ?, ?, ?)", (user, config.startingBalance, int(time.time()), config.startingBalance))
         
     def updateHighestBalance(self, userData, newBalance):
         if newBalance > userData["highest_balance"]:
@@ -108,14 +108,14 @@ class GoldenrodNostalgiaB(irc.IRCClient):
     def commandsAreEnabled(self):
         commandInfo = self.execQuerySelectOne("SELECT * FROM channels WHERE channel = ?", (self.factory.channel,))
         if commandInfo == None:
-            self.execQueryModify("INSERT INTO channels (channel, commandsEnabled, lastChange) VALUES(?, ?, ?)", (self.factory.channel, False, datetime.datetime.now()))
+            self.execQueryModify("INSERT INTO channels (channel, commandsEnabled, lastChange) VALUES(?, ?, ?)", (self.factory.channel, False, int(time.time())))
             commandInfo = self.execQuerySelectOne("SELECT * FROM channels WHERE channel = ?", (self.factory.channel,))
             
         return commandInfo["commandsEnabled"]
         
     def setCommandsEnabled(self, commandsEnabled):
         self.commandsEnabled = commandsEnabled
-        self.execQueryModify("UPDATE channels SET commandsEnabled = ?, lastChange = ? WHERE channel = ?", (commandsEnabled, datetime.datetime.now(), self.factory.channel))
+        self.execQueryModify("UPDATE channels SET commandsEnabled = ?, lastChange = ? WHERE channel = ?", (commandsEnabled, int(time.time()), self.factory.channel))
             
     # return 0 if they can play or cooldown in seconds remaining otherwise
     def canPlayGame(self, userData):
@@ -310,9 +310,9 @@ def addToCommandsEnabled(channel):
             cursor.execute("SELECT * FROM channels WHERE channel = ?", (channel,))
             channelData = cursor.fetchone()
             if channelData == None:
-                cursor.execute("INSERT INTO channels (channel, commandsEnabled, lastChange) VALUES(?, ?, ?)", (channel, True, datetime.datetime.now()))
+                cursor.execute("INSERT INTO channels (channel, commandsEnabled, lastChange) VALUES(?, ?, ?)", (channel, True, int(time.time())))
             else:
-                cursor.execute("UPDATE channels SET commandsEnabled = ?, lastChange = ? WHERE channel = ?", (True, datetime.datetime.now(), channel))
+                cursor.execute("UPDATE channels SET commandsEnabled = ?, lastChange = ? WHERE channel = ?", (True, int(time.time()), channel))
             return
         finally:
             lock.release()
@@ -329,9 +329,9 @@ def removeFromCommandsEnabled(channel):
             cursor.execute("SELECT * FROM channels WHERE channel = ?", (channel,))
             channelData = cursor.fetchone()
             if channelData == None:
-                cursor.execute("INSERT INTO channels (channel, commandsEnabled, lastChange) VALUES(?, ?, ?)", (channel, False, datetime.datetime.now()))
+                cursor.execute("INSERT INTO channels (channel, commandsEnabled, lastChange) VALUES(?, ?, ?)", (channel, False, int(time.time())))
             else:
-                cursor.execute("UPDATE channels SET commandsEnabled = ?, lastChange = ? WHERE channel = ?", (False, datetime.datetime.now(), channel))
+                cursor.execute("UPDATE channels SET commandsEnabled = ?, lastChange = ? WHERE channel = ?", (False, int(time.time()), channel))
             return
         finally:
             lock.release()

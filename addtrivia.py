@@ -1,5 +1,5 @@
 import sqlite3
-import datetime
+import time
 
 conn = sqlite3.connect("contests.db", check_same_thread=False)
 conn.row_factory = sqlite3.Row
@@ -41,7 +41,7 @@ while True:
         print "Not allowed to have no answers, try again."
         continue
     
-    cursor.execute("INSERT INTO trivia_questions (question, difficulty, whenAdded, question_grouping) VALUES(?, ?, ?, ?)", (question, difficulty, datetime.datetime.now(), questionGroup))
+    cursor.execute("INSERT INTO trivia_questions (question, difficulty, whenAdded, question_grouping) VALUES(?, ?, ?, ?)", (question, difficulty, int(time.time()), questionGroup))
     rowid = cursor.lastrowid
     for answer in answers:
         cursor.execute("INSERT INTO trivia_answers (question_id, answer) VALUES(?, ?)", (rowid, answer))

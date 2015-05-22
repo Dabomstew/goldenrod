@@ -38,7 +38,7 @@ def execute(parser, bot, user, args):
             timestamps = []
             timestamps.append(float(timeNow - 1430000000))
             for handoutRow in listOfHandouts:
-                thistime = time.mktime(time.strptime(handoutRow["whenHappened"].encode("utf-8").split(".")[0], "%Y-%m-%d %H:%M:%S"))
+                thistime = handoutRow["whenHappened"]
                 timestamps.append(float(thistime - 1430000000))
             
             diffs = []
@@ -79,10 +79,10 @@ def execute(parser, bot, user, args):
             handoutMessages = ["You irresponsible gambler, how dare you waste my generosity. But I feel obligated to get you back on your feet again, so here's %d %s." % (handout, currencyNow), "Another yolocoiner? The line's over there... Fine, have %d %s but get out of my sight." % (handout, currencyNow)]
             
         newHighest = max(userData["highest_handout"], handout)
-        queryArgs = (userData["balance"]+handout, timeNow, datetime.datetime.now(), newHighest, user, userData["balance"])
+        queryArgs = (userData["balance"]+handout, timeNow, timeNow, newHighest, user, userData["balance"])
         bot.execQueryModify("UPDATE users SET balance = ?, last_game = ?, last_activity = ?, handouts = handouts + 1, highest_handout = ? WHERE twitchname = ? AND balance = ?", queryArgs)
         bot.updateHighestBalance(userData, userData["balance"]+handout)
-        logArgs = (user, handout, datetime.datetime.now(), bot.factory.channel)
+        logArgs = (user, handout, timeNow, bot.factory.channel)
         bot.execQueryModify("INSERT INTO handouts (twitchname, amount, whenHappened, channel) VALUES(?, ?, ?, ?)", logArgs)
         
         bot.channelMsg("%s -> %s" % (user, random.choice(handoutMessages)))

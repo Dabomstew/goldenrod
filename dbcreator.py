@@ -1,5 +1,5 @@
 # create database for goldenrodgames
-import datetime
+import datetime, time
 import config
 
 def create(conn, cursor):
@@ -47,9 +47,9 @@ def create(conn, cursor):
     cursor.execute("""CREATE INDEX "taxes_channel" ON "taxes" ("channel" ASC)""")
     cursor.execute("""CREATE INDEX "trivia_winners_channel" ON "trivia_winners" ("channel" ASC)""")
     conn.commit()
-    cursor.execute("""INSERT INTO slotspool (slotspool, last_change, last_winner) VALUES(?, ?, ?)""", (100, datetime.datetime.now(), datetime.datetime.now()))
-    cursor.execute("""INSERT INTO channels (channel, commandsEnabled, lastChange, joinIfLive) VALUES(?, ?, ?, ?)""", (config.botNick, False, datetime.datetime.now(), False))
-    cursor.execute("""INSERT INTO trivia_questions (question, difficulty, whenAdded, question_grouping, used_in_cycle) VALUES(?, ?, ?, ?, ?)""", ("Sample question", 0, datetime.datetime.now(), 1, 0))
+    cursor.execute("""INSERT INTO slotspool (slotspool, last_change, last_winner) VALUES(?, ?, ?)""", (100, int(time.time()), int(time.time())))
+    cursor.execute("""INSERT INTO channels (channel, commandsEnabled, lastChange, joinIfLive) VALUES(?, ?, ?, ?)""", (config.botNick, False, int(time.time()), False))
+    cursor.execute("""INSERT INTO trivia_questions (question, difficulty, whenAdded, question_grouping, used_in_cycle) VALUES(?, ?, ?, ?, ?)""", ("Sample question", 0, int(time.time()), 1, 0))
     cursor.execute("""INSERT INTO trivia_answers (question_id, answer) VALUES(?, ?)""", (1, "Sample answer"))
-    cursor.execute("""INSERT INTO hangman_words (word, whenAdded, used_in_cycle) VALUES(?, ?, ?)""", ("test", datetime.datetime.now(), 0))
+    cursor.execute("""INSERT INTO hangman_words (word, whenAdded, used_in_cycle) VALUES(?, ?, ?)""", ("test", int(time.time()), 0))
     conn.commit()

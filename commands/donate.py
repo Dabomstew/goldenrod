@@ -61,14 +61,14 @@ def execute(parser, bot, user, args):
     else:
         theirNewBal = otherUser["balance"] + taxedAmount
         ourNewBal = userData["balance"] - amount
-        firstArgList = (ourNewBal, datetime.datetime.now(), user, userData["balance"])
+        firstArgList = (ourNewBal, int(time.time()), user, userData["balance"])
         if bot.execQueryModify("UPDATE users SET balance = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", firstArgList) == 1:
             secondArgList = (theirNewBal, otherUserTry, otherUser["balance"])
             bot.execQueryModify("UPDATE users SET balance = ? WHERE twitchname = ? AND balance = ?", secondArgList)
             bot.updateHighestBalance(otherUser, theirNewBal)
             outputList = (user, amount, config.currencyName if (amount == 1) else config.currencyPlural, otherUserTry, taxedAmount, config.currencyName if (taxedAmount == 1) else config.currencyPlural)
             bot.channelMsg("%s -> Donated %d %s to %s, they received %d %s." % outputList)
-            logArgs = (user, otherUserTry, amount, datetime.datetime.now(), bot.factory.channel)
+            logArgs = (user, otherUserTry, amount, int(time.time()), bot.factory.channel)
             bot.execQueryModify("INSERT INTO donations (fromPlayer, toPlayer, amount, whenHappened, channel) VALUES(?, ?, ?, ?, ?)", logArgs)
         else:
             bot.channelMsg("%s -> Donation failed." % user)

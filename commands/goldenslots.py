@@ -52,23 +52,23 @@ def execute(parser, bot, user, args):
                 elif(reelOne == "BAR"):
                     winnings = int(math.floor(winnings*3/2))
                 
-                argsListOne = (100, datetime.datetime.now(), datetime.datetime.now(), slotsPool["slotspool"])
+                argsListOne = (100, timeNow, timeNow, slotsPool["slotspool"])
                 if bot.execQueryModify("UPDATE slotspool SET slotspool = ?, last_change = ?, last_winner = ? WHERE slotspool = ?", argsListOne) == 1:
                     newBal = newBal + winnings
-                    argsListTwo = (newBal, timeNow, datetime.datetime.now(), user, userData["balance"])
+                    argsListTwo = (newBal, timeNow, timeNow, user, userData["balance"])
                     bot.execQueryModify("UPDATE users SET balance = ?, last_game = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", argsListTwo)
                     bot.updateHighestBalance(userData, newBal)
                     bot.channelMsg("%s -> %s | %s | %s - Winner! +%d %s." % (user, reelOne, reelTwo, reelThree, winnings, config.currencyPlural))
             else:
                 winnings = -gamble
-                argsListOne = (slotsPool["slotspool"]+gamble, datetime.datetime.now(), slotsPool["slotspool"])
+                argsListOne = (slotsPool["slotspool"]+gamble, timeNow, slotsPool["slotspool"])
                 if bot.execQueryModify("UPDATE slotspool SET slotspool = ?, last_change = ? WHERE slotspool = ?", argsListOne) == 1:
                     newBal = newBal - gamble
-                    argsListTwo = (newBal, timeNow, datetime.datetime.now(), user, userData["balance"])
+                    argsListTwo = (newBal, timeNow, timeNow, user, userData["balance"])
                     bot.execQueryModify("UPDATE users SET balance = ?, last_game = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", argsListTwo)
                     bot.channelMsg("%s -> %s | %s | %s - Not this time! -%d %s." % (user, reelOne, reelTwo, reelThree, gamble, config.currencyName if (gamble == 1) else config.currencyPlural))
             
-            logArgs = (user, reelOne, reelTwo, reelThree, True if (reelOne==reelTwo and reelOne==reelThree) else False, winnings, datetime.datetime.now(), bot.factory.channel)
+            logArgs = (user, reelOne, reelTwo, reelThree, True if (reelOne==reelTwo and reelOne==reelThree) else False, winnings, timeNow, bot.factory.channel)
             bot.execQueryModify("INSERT INTO slots (twitchname, reelOne, reelTwo, reelThree, winner, balChange, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", logArgs)
         else:
             bot.channelMsg("%s -> The slots cost 5 %s to play, you don't have enough." % (user, config.currencyPlural))

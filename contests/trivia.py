@@ -75,9 +75,9 @@ class Game:
                 queryArgList = (theirNewBal, user, userData["balance"])
                 self.bot.execQueryModify("UPDATE users SET balance = ?, contests_won = contests_won + 1 WHERE twitchname = ? AND balance = ?", queryArgList)
                 self.bot.updateHighestBalance(userData, theirNewBal)
-                logArgList = (user, "trivia", msglower, prize, datetime.datetime.now(), self.bot.factory.channel)
+                logArgList = (user, "trivia", msglower, prize, int(time.time()), self.bot.factory.channel)
                 self.bot.execQueryModify("INSERT INTO contestwins (twitchname, gameid, answer, reward, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?)", logArgList)
-                secondlogArgList = (user, self.questionData["id"], elapsedTime, prize, datetime.datetime.now(), self.bot.factory.channel)
+                secondlogArgList = (user, self.questionData["id"], elapsedTime, prize, int(time.time()), self.bot.factory.channel)
                 self.bot.execQueryModify("INSERT INTO trivia_winners (twitchname, question_id, timeTaken, reward, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?)", secondlogArgList)
                 self.contestmanager.contestIsDone()
                 return

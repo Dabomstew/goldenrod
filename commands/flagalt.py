@@ -12,7 +12,7 @@ def execute(parser, bot, user, args):
     
     otherUserTry = arglist[0].lower()
     
-    bot.execQueryModify("INSERT INTO alts (twitchname, whenHappened) VALUES(?, ?)", (otherUserTry,datetime.datetime.now()))
+    bot.execQueryModify("INSERT INTO alts (twitchname, whenHappened) VALUES(?, ?)", (otherUserTry,int(time.time())))
     bot.channelMsg("%s -> Flagged %s as an alt, they are no longer allowed to donate." % (user, otherUserTry))
     
 def requiredPerm():

@@ -67,10 +67,10 @@ class ChannelManager:
                         updateIDs = []
                         for row in bhRows:
                             del broadcastIDs[row["id"]]
-                            self.cursor.execute("UPDATE broadcast_history SET last_seen = ? WHERE id = ?", (datetime.datetime.now(), row["id"]))
+                            self.cursor.execute("UPDATE broadcast_history SET last_seen = ? WHERE id = ?", (int(time.time()), row["id"]))
                         
                         for newID in broadcastIDs:
-                            self.cursor.execute("INSERT INTO broadcast_history (id, channel, first_seen, last_seen) VALUES(?, ?, ?, ?)", (newID, broadcastIDs[newID], datetime.datetime.now(), datetime.datetime.now()))
+                            self.cursor.execute("INSERT INTO broadcast_history (id, channel, first_seen, last_seen) VALUES(?, ?, ?, ?)", (newID, broadcastIDs[newID], int(time.time()), int(time.time())))
                         
                         self.conn.commit()
                     finally:
