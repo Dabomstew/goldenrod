@@ -65,7 +65,6 @@ class ContestManager:
             contestProb = contestEntry[1]
             if chosen > cumuProb and chosen <= cumuProb + contestProb:
                 # chosen this game
-                print "chosen %s" % contestName
                 self.currentContest = self.contestModules[contestName].Game(self)
                 self.currentContest.start()
                 currtime = self.unixTimestamp()

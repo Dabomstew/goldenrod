@@ -24,10 +24,8 @@ class MessageQueue:
     def run(self):
         while True:
             message = self.queue.get()
-            print message
             delay = twitchDelayMod if self.bot.isMod else twitchDelayNonMod
             timeNow = time.time()
-            print "%f %f" % (delay, timeNow)
             if message["message"].strip() == self.lastMessage and not message["repeat"] and timeNow - twitchRepeatTimeout < self.lastMessageTime:
                 # drop for being a repeat
                 continue

@@ -1,7 +1,7 @@
 # twisted imports
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
-from twisted.python import log
+import logging
 
 # system imports
 
@@ -156,7 +156,6 @@ class GoldenrodNostalgiaB(irc.IRCClient):
     def joined(self, channel):
         """This will get called when the bot joins the channel."""
         self.commandsEnabled = self.commandsAreEnabled()
-        print "joined %s" % (channel)
         self.acceptCommands = True
         self.isMod = (config.botNick == self.factory.channel)
         self.channelMods = []
@@ -173,15 +172,13 @@ class GoldenrodNostalgiaB(irc.IRCClient):
         """This will get called when the bot receives a message."""
         user = user.split('!', 1)[0]
         
-        print "%s says %s on %s" % (user, msg, channel)
+        reactor.rootLogger.info(("%s --> %s : %s" % (user, channel, msg)).decode("utf-8"))
         # Check to see if they're sending me a private message
         if channel == self.nickname:
             if user == "jtv":
                 if msg.startswith(config.twitchModsMsg):
                     self.channelMods = msg[len(config.twitchModsMsg):].split(", ")
                     self.isMod = (self.nickname in self.channelMods) or (self.nickname == self.factory.channel)
-                    print self.channelMods
-                    print self.isMod
                     
             return
             
@@ -216,9 +213,11 @@ class GoldenrodNostalgiaB(irc.IRCClient):
         self.quit()
     
     def channelMsg(self, message):
+        reactor.rootLogger.info(("%s --> %s (queueing) : %s" % (config.botNick, "#%s"%self.factory.channel, message)).decode("utf-8"))
         self.queueMsg("#%s" % self.factory.channel, message, False)
         
     def channelMsgRA(self, message):
+        reactor.rootLogger.info(("%s --> %s (queueing, repeat) : %s" % (config.botNick, "#%s"%self.factory.channel, message)).decode("utf-8"))
         self.queueMsg("#%s" % self.factory.channel, message, True)
         
     def queueMsg(self, channel, message, repeat):
@@ -234,7 +233,6 @@ def connectToTwitch(startChannel, commandParser, waitTimeout):
     # connect factory to this host and port
     twitchServers = ["192.16.64.11", "192.16.64.144", "192.16.64.145", "192.16.64.146", "192.16.64.152", "192.16.64.155"]
     myServer = random.choice(twitchServers)
-    print "picked", myServer
     reactor.connectTCP(myServer, 6667, f)
     
 class GoldenrodFactory(protocol.ClientFactory):
@@ -274,7 +272,6 @@ def joinNewChannel(channel):
         channel = channel[1:]
     if channel in channelInstances:
         return
-    print reactor.commandParser
     connectToTwitch(channel, reactor.commandParser, 0)
 
 def leaveChannel(channel, message):
@@ -341,7 +338,17 @@ def removeFromCommandsEnabled(channel):
 if __name__ == '__main__':
     # initialize logging
     # log.startLogging(sys.stdout)
-    log.startLogging(open('./logs/%d.log' % (time.time()), 'w'))
+    #log.startLogging(open('./logs/%d.log' % (time.time()), 'w'))
+    
+    handler = logging.FileHandler('./logs/%d.log' % (time.time()), "w",
+                                  encoding = "UTF-8")
+    formatter = logging.Formatter("%(asctime)s %(message)s")
+    handler.setFormatter(formatter)
+    root_logger = logging.getLogger()
+    root_logger.addHandler(handler)
+    root_logger.setLevel(logging.INFO)
+    reactor.rootLogger = root_logger
+    
     commandParser = commandparser.CommandParser()
     commandParser.loadCommands()
     reactor.commandParser = commandParser

@@ -15,7 +15,6 @@ class ChannelManager:
         time.sleep(5.0)
         lastOnlineList = []
         while True:
-            print "channel joiner loop"
             # fetch autojoin channels
             autojoins = []
             autojoinRows = []
@@ -35,7 +34,6 @@ class ChannelManager:
             if config.botNick in autojoins:
                 autojoins.remove(config.botNick)
                 
-            print ",".join(autojoins)
             if len(autojoins) > 0:
                 # fetch live channels
                 ajURLList = ",".join(autojoins)
@@ -52,7 +50,6 @@ class ChannelManager:
                         if stream[u'viewers'] >= 10:
                             enableContests.append(stream[u'channel'][u'name'].encode("utf-8"))
                 except ValueError:
-                    print "request failed"
                     processJoinParts = False
                     
                 if processJoinParts:
@@ -75,8 +72,7 @@ class ChannelManager:
                         self.conn.commit()
                     finally:
                         self.lock.release()
-            
-            print ",".join(autojoins)            
+                     
             # join shit idk
             if processJoinParts:
                 from goldenrod import channelInstances
@@ -84,7 +80,6 @@ class ChannelManager:
                 for autojoin in autojoins:
                     if autojoin not in channelInstances:
                         from goldenrod import joinNewChannel
-                        print "joining %s" % autojoin
                         joinNewChannel(autojoin)
                         
                 # leave old channels
@@ -97,7 +92,6 @@ class ChannelManager:
                         
                 for channel in leaveChannels:
                     from goldenrod import leaveChannel
-                    print "leaving %s" % channel
                     leaveChannel(channel, config.byeMessage)
             
             # cycle through last online
