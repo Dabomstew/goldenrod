@@ -5,7 +5,7 @@ from twisted.python import log
 
 # system imports
 
-import datetime, time, sys, threading
+import datetime, time, sys, threading, os.path
 import commandparser
 import messagequeue
 import contestmanager
@@ -26,7 +26,10 @@ try:
 except sqlite3.OperationalError:
     import dbcreator
     dbcreator.create(conn, cursor)
-    
+
+if os.path.isfile("./contests.db"):
+    # attach it
+    cursor.execute("ATTACH DATABASE \"contests.db\" AS contests")
     
 lock = threading.Lock()
 
