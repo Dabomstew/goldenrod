@@ -35,6 +35,7 @@ def execute(parser, bot, user, args):
         
     userData = bot.getUserDetails(user)
     arglist = args.split()
+    timeNow = int(time.time())
     try:
         amount = int(arglist[1])
     except ValueError:
@@ -55,7 +56,7 @@ def execute(parser, bot, user, args):
         bot.channelMsg("%s -> Try harder please." % user)
         return
         
-    historyRow = bot.execQuerySelectOne("SELECT COALESCE(SUM(amount),0) AS totalDonated FROM donations WHERE fromPlayer = ? AND toPlayer = ?", (user, otherUserTry))
+    historyRow = bot.execQuerySelectOne("SELECT COALESCE(SUM(amount),0) AS totalDonated FROM donations WHERE fromPlayer = ? AND toPlayer = ? AND whenHappened >= ?", (user, otherUserTry, timeNow - 86400*2))
     oldAmount = historyRow["totalDonated"]
     newAmount = oldAmount + amount
     oldTax = taxOn(oldAmount)
