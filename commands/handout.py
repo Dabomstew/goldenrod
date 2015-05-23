@@ -53,7 +53,7 @@ def execute(parser, bot, user, args):
                 vartotal += (diffval - meantotal)*(diffval - meantotal)
             sdevtotal = math.sqrt(vartotal/10.0)
             print "sdev=", sdevtotal
-            if sdevtotal < 1:
+            if sdevtotal < 0.75:
                 bannedUntil = timeNow + config.handoutScriptBan
                 bot.channelMsg("%s -> stop scripting! (banned from handouts for 1 hour)" % user)
                 bot.execQueryModify("UPDATE users SET handout_ban = ? WHERE twitchname = ?", (bannedUntil, user))
