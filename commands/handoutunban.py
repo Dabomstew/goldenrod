@@ -12,7 +12,7 @@ def execute(parser, bot, user, args):
     
     otherUserTry = arglist[0].lower()
     
-    bot.execQueryModify("UPDATE users SET handout_ban = 0 WHERE twitchname = ?", (otherUserTry))
+    bot.execQueryModify("UPDATE users SET handout_ban = 0 WHERE twitchname = ?", (otherUserTry,))
     bot.channelMsg("%s -> Unbanned %s from handouts." % (user, otherUserTry))
     
 def requiredPerm():
