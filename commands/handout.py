@@ -86,6 +86,13 @@ def execute(parser, bot, user, args):
         bot.execQueryModify("INSERT INTO handouts (twitchname, amount, whenHappened, channel) VALUES(?, ?, ?, ?)", logArgs)
         
         bot.channelMsg("%s -> %s" % (user, random.choice(handoutMessages)))
+        
+        if handout > 60:
+            bot.channelMsg("Congratulations %s! You should probably go buy a lottery ticket..." % user)
+        elif handout > 50:
+            bot.channelMsg("Well done, %s! 50 points! Just think of how many you could have had if you won 16 yolocoins in a row instead..." % user)
+        elif handout > 40:
+            bot.channelMsg("40 points, not bad at all %s. But would you have preferred to use that luck on a shiny?" % user)
     else:
         if config.showCooldowns:
             bot.channelMsg("%s -> On cooldown. (%d secs)" % (user, canPlay))
