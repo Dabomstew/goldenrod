@@ -2,6 +2,26 @@ import config
 import random
 import datetime, time, math
 
+def taxOn(amount):
+    tax = 0
+    if amount > 200:
+        taxable = min(amount - 200, 300)
+        tax = tax + int(math.floor(taxable*3/10))
+        
+    if amount > 500:
+        taxable = min(amount - 500, 500)
+        tax = tax + int(math.floor(taxable*4/10))
+        
+    if amount > 1000:
+        taxable = min(amount - 1000, 9000)
+        tax = tax + int(math.floor(taxable*6/10))
+        
+    if amount > 10000:
+        taxable = amount - 10000
+        tax = tax + int(math.floor(taxable*9/10))
+        
+    return tax
+
 def execute(parser, bot, user, args):
     if "bot" in user:
         bot.channelMsg("%s -> LOL nope." % user)
@@ -25,26 +45,6 @@ def execute(parser, bot, user, args):
         bot.channelMsg("%s -> Invalid amount to donate." % user)
         return
         
-    tax = 0
-    
-    if amount > 50:
-        taxable = min(amount - 50, 50)
-        tax = tax + int(math.floor(taxable*3/10))
-        
-    if amount > 100:
-        taxable = min(amount - 100, 900)
-        tax = tax + int(math.floor(taxable*4/10))
-        
-    if amount > 1000:
-        taxable = min(amount - 1000, 9000)
-        tax = tax + int(math.floor(taxable*6/10))
-        
-    if amount > 10000:
-        taxable = amount - 10000
-        tax = tax + int(math.floor(taxable*9/10))
-    
-    taxedAmount = amount - tax
-    
     otherUserTry = arglist[0].lower()
     
     if otherUserTry == user:
@@ -54,6 +54,15 @@ def execute(parser, bot, user, args):
     if otherUserTry in user or user in otherUserTry:
         bot.channelMsg("%s -> Try harder please." % user)
         return
+        
+    historyRow = bot.execQuerySelectOne("SELECT COALESCE(SUM(amount),0) AS totalDonated FROM donations WHERE fromPlayer = ? AND toPlayer = ?", (user, otherUserTry))
+    oldAmount = historyRow["totalDonated"]
+    newAmount = oldAmount + amount
+    oldTax = taxOn(oldAmount)
+    newTax = taxOn(newAmount)
+    tax = newTax - oldTax
+    
+    taxedAmount = amount - tax
     
     otherUser = bot.execQuerySelectOne("SELECT * FROM users WHERE twitchname = ?", (otherUserTry,))
     if otherUser == None:
