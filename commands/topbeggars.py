@@ -3,11 +3,11 @@ import random
 import datetime, time
 
 def execute(parser, bot, user, args):
-    topwhat = 3
+    topwhat = 5
     try:
         topwhat = int(args)
     except ValueError:
-        topwhat = 3
+        topwhat = 5
     
     if topwhat < 1:
         topwhat = 1
