@@ -40,6 +40,23 @@ class Game:
         
         return shuffledWord.upper()
         
+    def calcPrize(self, word, elapsedTime):
+        prize = config.scramblePrizeBase
+        
+        if len(word) < 8:
+            prize = int(prize * math.pow(0.8, 8-len(word)))
+        elif len(word) > 10:
+            prize = int(prize * math.pow(1.05, len(word)-10))
+            
+        if elapsedTime >= config.scramblePrizeReducFirst:
+            prize = int(prize/2)
+            
+        if elapsedTime >= config.scramblePrizeReducSecond:
+            prize = int(prize/2)  
+            
+        return prize
+        
+        
     def start(self):
         # first select a word
         self.startTime = int(time.time())
@@ -54,7 +71,7 @@ class Game:
             self.word = wordData["word"].encode("utf-8").lower()
         print self.word
         self.scrambledWord = self.shuffleWord(self.word)
-        msgArgs = (config.scramblePrizeBase, config.currencyPlural, config.contestDuration)
+        msgArgs = (self.calcPrize(self.word, 0), config.currencyPlural, config.contestDuration)
         self.bot.channelMsg("Word scramble! I have chosen a random word from my collection of Pokemon and Pokemon speedrunning-related terms and scrambled it. The first person to guess the word gets %d %s, with some taken off if it takes too long (to discourage cheating). You have %d seconds. Good luck!" % msgArgs)
         self.bot.channelMsg("Kappa Kappa Kappa | The word is: %s | Kappa Kappa Kappa" % self.scrambledWord)
         
@@ -85,14 +102,8 @@ class Game:
                     lowerword = arglist[1].lower()
                     if(lowerword == self.word):
                         # woo they won
-                        prize = config.scramblePrizeBase
                         elapsedTime = int(time.time()) - self.startTime
-                        if elapsedTime >= config.scramblePrizeReducFirst:
-                            prize = int(prize/2)
-                            
-                        if elapsedTime >= config.scramblePrizeReducSecond:
-                            prize = int(prize/2)  
-                            
+                        prize = self.calcPrize(self.word, elapsedTime)
                         
                         self.bot.channelMsg("%s guessed %s correctly first! They win %d %s." % (user, self.word, prize, config.currencyPlural))
                         userData = self.bot.getUserDetails(user)
