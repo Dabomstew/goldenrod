@@ -17,6 +17,7 @@ import channelmanager
 commandParser = None
 channelManager = None
 channelInstances = {}
+allInstances = []
 conn = sqlite3.connect("goldenrod.db", check_same_thread=False)
 conn.row_factory = sqlite3.Row
 cursor = conn.cursor()
@@ -209,6 +210,8 @@ class GoldenrodNostalgiaB(irc.IRCClient):
         while not self.messageQueue.queue.empty():
             time.sleep(0.5)
         time.sleep(5.0)
+        from goldenrod import allInstances
+        allInstances.remove(self)
         self.factory.killBot = True
         self.quit()
     
@@ -246,8 +249,9 @@ class GoldenrodFactory(protocol.ClientFactory):
 
     def buildProtocol(self, addr):
         p = GoldenrodNostalgiaB(self.commandParser)
-        from goldenrod import channelInstances
+        from goldenrod import channelInstances, allInstances
         channelInstances[self.channel] = p
+        allInstances.append(p)
         p.factory = self
         return p
 

@@ -14,6 +14,7 @@ class ChannelManager:
         # wait for reactor to boot up
         time.sleep(5.0)
         lastOnlineList = []
+        lastChannelList = []
         while True:
             # fetch autojoin channels
             autojoins = []
@@ -96,6 +97,20 @@ class ChannelManager:
             
             # cycle through last online
             lastOnlineList = autojoins
+            
+            # check for stray instances
+            from goldenrod import channelInstances, allInstances
+            channelList = []
+            for channel in channelInstances:
+                channelList.append(channelInstances[channel])
+                
+            for instance in allInstances:
+                if instance not in channelList and instance not in lastChannelList:
+                    # silently kill this instance
+                    instance.leaveChannel("")
+                    
+            # cycle through instance list
+            lastChannelList = channelList
             
             # sleep until next time
             time.sleep(60.0)
