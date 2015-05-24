@@ -35,6 +35,10 @@ def execute(parser, bot, user, args):
         
     userData = bot.getUserDetails(user)
     arglist = args.split()
+    if len(arglist) < 2:
+        bot.channelMsg("%s -> Invalid arguments. Use %sdonate user amount" % (user, config.cmdChar))
+        return
+    
     timeNow = int(time.time())
     try:
         amount = int(arglist[1])
