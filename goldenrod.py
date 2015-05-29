@@ -207,13 +207,14 @@ class GoldenrodNostalgiaB(irc.IRCClient):
         klThread.start()
     
     def killRequest(self):
-        while not self.messageQueue.queue.empty():
+        while not (self.messageQueue == None) and not self.messageQueue.queue.empty():
             time.sleep(0.5)
         time.sleep(5.0)
         from goldenrod import allInstances
         allInstances.remove(self)
-        self.factory.killBot = True
         self.quit()
+        self.factory.killBot = True
+        
     
     def channelMsg(self, message):
         reactor.rootLogger.info(("%s --> %s (queueing) : %s" % (config.botNick, "#%s"%self.factory.channel, message)).decode("utf-8"))
@@ -246,10 +247,14 @@ class GoldenrodFactory(protocol.ClientFactory):
         self.oldWait = waitTimeout
         self.timeouts = { 0: 5, 0.1: 5, 5: 10, 10: 30, 30: 60, 60: 300, 300: 300 }
         self.commandParser = commandParser
+        self.instance = None
 
     def buildProtocol(self, addr):
-        p = GoldenrodNostalgiaB(self.commandParser)
         from goldenrod import channelInstances, allInstances
+        if self.channel in channelInstances:
+            self.instance = None
+            return None
+        p = GoldenrodNostalgiaB(self.commandParser)
         channelInstances[self.channel] = p
         allInstances.append(p)
         p.factory = self
@@ -258,10 +263,22 @@ class GoldenrodFactory(protocol.ClientFactory):
     def clientConnectionLost(self, connector, reason):
         """If we get disconnected, reconnect to server."""
         if not self.killBot:
+            from goldenrod import channelInstances, allInstances
+            if self.instance in channelInstances.values():
+                channelInstances.remove(self.instance)
+            if self.instance in allInstances:
+                allInstances.remove(self.instance) 
+            self.instance = None
             connector.connect()
 
     def clientConnectionFailed(self, connector, reason):
         if not self.killBot:
+            from goldenrod import channelInstances, allInstances
+            if self.instance in channelInstances.values():
+                channelInstances.remove(self.instance)
+            if self.instance in allInstances:
+                allInstances.remove(self.instance)    
+            self.instance = None
             if self.oldWait not in self.timeouts:
                 self.newWait = 5
             else:
