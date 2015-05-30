@@ -199,6 +199,8 @@ class GoldenrodNostalgiaB(irc.IRCClient):
                 self.commandParser.parse(self, user, command, args)
     
     def leaveChannel(self, byeMessage):
+        if not self.acceptCommands:
+            return
         if byeMessage != None and byeMessage != "":
             self.queueMsg("#%s" % self.factory.channel, byeMessage, True)
         self.acceptCommands = False
@@ -207,14 +209,15 @@ class GoldenrodNostalgiaB(irc.IRCClient):
         klThread.start()
     
     def killRequest(self):
-        while not (self.messageQueue == None) and not self.messageQueue.queue.empty():
-            time.sleep(0.5)
-        time.sleep(5.0)
+        try:
+            while not (self.messageQueue == None) and not self.messageQueue.queue.empty():
+                time.sleep(0.5)
+        except AttributeError:
+            pass
         from goldenrod import allInstances
         allInstances.remove(self)
-        self.quit()
         self.factory.killBot = True
-        
+        self.quit()
     
     def channelMsg(self, message):
         reactor.rootLogger.info(("%s --> %s (queueing) : %s" % (config.botNick, "#%s"%self.factory.channel, message)).decode("utf-8"))
@@ -357,11 +360,11 @@ def removeFromCommandsEnabled(channel):
         channelInstances[channel].setCommandsEnabled(False)
 
 if __name__ == '__main__':
-    # initialize logging
-    # log.startLogging(sys.stdout)
-    #log.startLogging(open('./logs/%d.log' % (time.time()), 'w'))
+    #initialize logging
+    #log.startLogging(sys.stdout)
+    log.startLogging(open('./logs/%d_stdouterr.log' % (time.time()), 'w'))
     
-    handler = logging.FileHandler('./logs/%d.log' % (time.time()), "w",
+    handler = logging.FileHandler('./logs/%d_messages.log' % (time.time()), "w",
                                   encoding = "UTF-8")
     formatter = logging.Formatter("%(asctime)s %(message)s")
     handler.setFormatter(formatter)
