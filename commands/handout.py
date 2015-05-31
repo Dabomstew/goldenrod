@@ -20,6 +20,20 @@ def thinpurgeise(str):
         ind += 1
     return newstr.encode('utf-8')
     
+def handoutsdev(diffs, number):
+    meantotal = 0
+    for i in xrange(0, number):
+        meantotal += diffs[i]
+        
+    meantotal = meantotal/float(number)
+    vartotal = 0.0
+    
+    for i in xrange(0, number):
+        vartotal += (diffs[i] - meantotal) ** 2
+        
+    sdev = math.sqrt(vartotal/float(number))
+    return sdev
+    
 def execute(parser, bot, user, args):
     argslow = args.lower().strip()
     saidPlease = argslow.startswith("please") or argslow.startswith("pls") or argslow.startswith("plz")
@@ -32,9 +46,8 @@ def execute(parser, bot, user, args):
     canPlay = bot.canPlayGame(userData)
     if canPlay == 0:
         # let's look at sdevs
-        listOfHandouts = bot.execQuerySelectMultiple("SELECT * FROM handouts WHERE twitchname = ? ORDER BY rowid DESC LIMIT 10", (user,))
-        if len(listOfHandouts) == 10:
-            meantotal = 0.0
+        listOfHandouts = bot.execQuerySelectMultiple("SELECT * FROM handouts WHERE twitchname = ? ORDER BY rowid DESC LIMIT 50", (user,))
+        if len(listOfHandouts) >= 10:
             timestamps = []
             timestamps.append(float(timeNow - 1430000000))
             for handoutRow in listOfHandouts:
@@ -42,22 +55,33 @@ def execute(parser, bot, user, args):
                 timestamps.append(float(thistime - 1430000000))
             
             diffs = []
-            for i in xrange(0, 10):
+            for i in xrange(0, len(timestamps)-1):
                 thisdiff = timestamps[i] - timestamps[i+1]
                 diffs.append(thisdiff)
-                meantotal += (thisdiff)
                 
-            meantotal = meantotal/10.0
-            vartotal = 0.0
-            for diffval in diffs:
-                vartotal += (diffval - meantotal)*(diffval - meantotal)
-            sdevtotal = math.sqrt(vartotal/10.0)
-            print "sdev=", sdevtotal
-            if sdevtotal < 0.75:
-                bannedUntil = timeNow + config.handoutScriptBan
-                bot.channelMsg("%s -> stop scripting! (banned from handouts for 1 hour)" % user)
-                bot.execQueryModify("UPDATE users SET handout_ban = ? WHERE twitchname = ?", (bannedUntil, user))
-                return
+            if len(diffs) >= 10:
+                shortTermSDev = handoutsdev(diffs, 10)
+                if shortTermSDev < 1:
+                    bannedUntil = timeNow + config.handoutScriptBan
+                    bot.channelMsg("%s -> You're either scripting handouts or need to ease up on the manual handout timing. Take a break from them for 1 hour." % user)
+                    bot.execQueryModify("UPDATE users SET handout_ban = ? WHERE twitchname = ?", (bannedUntil, user))
+                    return
+                    
+            if len(diffs) >= 30:
+                midTermSDev = handoutsdev(diffs, 30)
+                if midTermSDev < 3:
+                    bannedUntil = timeNow + config.handoutScriptBan
+                    bot.channelMsg("%s -> You're either scripting handouts or need to ease up on the manual handout timing. Take a break from them for 1 hour." % user)
+                    bot.execQueryModify("UPDATE users SET handout_ban = ? WHERE twitchname = ?", (bannedUntil, user))
+                    return
+                    
+            if len(diffs) >= 50:
+                longTermSDev = handoutsdev(diffs, 50)
+                if longTermSDev < 8:
+                    bannedUntil = timeNow + config.handoutScriptBan
+                    bot.channelMsg("%s -> You're either scripting handouts or need to ease up on the manual handout timing. Take a break from them for 1 hour." % user)
+                    bot.execQueryModify("UPDATE users SET handout_ban = ? WHERE twitchname = ?", (bannedUntil, user))
+                    return
         # success
         handout = 0
         while True:
