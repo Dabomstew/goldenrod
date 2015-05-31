@@ -265,31 +265,20 @@ class GoldenrodFactory(protocol.ClientFactory):
         return p
 
     def clientConnectionLost(self, connector, reason):
-        """If we get disconnected, reconnect to server."""
-        if not self.killBot:
-            from goldenrod import channelInstances, allInstances
-            if self.instance in channelInstances.values():
-                channelInstances.remove(self.instance)
-            if self.instance in allInstances:
-                allInstances.remove(self.instance) 
-            self.instance = None
-            connector.connect()
+        from goldenrod import channelInstances, allInstances
+        if self.instance in channelInstances.values():
+            channelInstances.remove(self.instance)
+        if self.instance in allInstances:
+            allInstances.remove(self.instance) 
+        self.instance = None
 
     def clientConnectionFailed(self, connector, reason):
-        if not self.killBot:
-            from goldenrod import channelInstances, allInstances
-            if self.instance in channelInstances.values():
-                channelInstances.remove(self.instance)
-            if self.instance in allInstances:
-                allInstances.remove(self.instance)    
-            self.instance = None
-            if self.oldWait not in self.timeouts:
-                self.newWait = 5
-            else:
-                self.newWait = self.timeouts[self.oldWait]
-            reconnThread = threading.Thread(target=connectToTwitch, args=(self.channel, self.commandParser, self.newWait))
-            reconnThread.daemon = True
-            reconnThread.start()
+        from goldenrod import channelInstances, allInstances
+        if self.instance in channelInstances.values():
+            channelInstances.remove(self.instance)
+        if self.instance in allInstances:
+            allInstances.remove(self.instance)    
+        self.instance = None
             
 def joinNewChannel(channel):
     from goldenrod import channelInstances
