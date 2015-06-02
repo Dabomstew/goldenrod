@@ -13,7 +13,8 @@ def execute(parser, bot, user, args):
         topwhat = 1
     
     if topwhat > 10:
-        topwhat = 10
+        bot.channelMsg("%s -> For the full toptalents leaderboard go here: http://twitchbot.dabomstew.com/goldenrod/leaderboards.php?board=toptalents" % user)
+        return
         
     # make sure there is a user to pick, the cheap way
     userData = bot.getUserDetails(user)

@@ -13,7 +13,8 @@ def execute(parser, bot, user, args):
         topwhat = 1
     
     if topwhat > 10:
-        topwhat = 10
+        bot.channelMsg("%s -> For the full bigslots leaderboard go here: http://twitchbot.dabomstew.com/goldenrod/leaderboards.php?board=bigslots" % user)
+        return
     
     if topwhat == 1:
         topWin = bot.execQuerySelectOne("SELECT * FROM slots WHERE balChange > 0 AND twitchname != ? ORDER BY balChange DESC LIMIT %d" % topwhat, (config.botOwner,))

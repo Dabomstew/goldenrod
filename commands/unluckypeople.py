@@ -13,7 +13,8 @@ def execute(parser, bot, user, args):
         topwhat = 1
     
     if topwhat > 10:
-        topwhat = 10
+        bot.channelMsg("%s -> For the full unluckypeople leaderboard go here: http://twitchbot.dabomstew.com/goldenrod/leaderboards.php?board=unluckypeople" % user)
+        return
     
     if topwhat == 1:
         topPlayer = bot.execQuerySelectOne("SELECT twitchname, COUNT(*) AS oneCount FROM handouts WHERE amount = 1 GROUP BY twitchname ORDER BY COUNT(*) DESC LIMIT 1")
