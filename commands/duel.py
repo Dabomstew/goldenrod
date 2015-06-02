@@ -134,10 +134,10 @@ def execute(parser, bot, user, args):
         if attackerRoll > defenderRoll:
             winnerMsgArgs = (otherUserTry, attackerRoll, user, defenderRoll, otherUserTry, duelData["amount"]*2, config.currencyPlural)
             bot.channelMsg("KevinTurtle KevinTurtle KevinTurtle | %s rolled a %d and %s rolled a %d. %s wins the %d %s! | KevinTurtle KevinTurtle KevinTurtle" % winnerMsgArgs)
-            loserBalArgs = (userData["balance"] - duelData["amount"], timeNow, user, userData["balance"])
-            if bot.execQueryModify("UPDATE users SET balance = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", loserBalArgs) == 1:
-                winnerBalArgs = (otherUserData["balance"] + duelData["amount"], timeNow, otherUserTry, otherUserData["balance"])
-                bot.execQueryModify("UPDATE users SET balance = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", winnerBalArgs)
+            loserBalArgs = (userData["balance"] - duelData["amount"], timeNow, userData["duel_profit"] - duelData["amount"], user, userData["balance"])
+            if bot.execQueryModify("UPDATE users SET balance = ?, last_activity = ?, duels_lost = duels_lost + 1, duel_profit = ? WHERE twitchname = ? AND balance = ?", loserBalArgs) == 1:
+                winnerBalArgs = (otherUserData["balance"] + duelData["amount"], timeNow, otherUserData["duel_profit"] + duelData["amount"], otherUserTry, otherUserData["balance"])
+                bot.execQueryModify("UPDATE users SET balance = ?, last_activity = ?, duels_won = duels_won + 1, duel_profit = ? WHERE twitchname = ? AND balance = ?", winnerBalArgs)
                 bot.updateHighestBalance(otherUserData, otherUserData["balance"]+duelData["amount"])
                 resultLogArgs = (otherUserTry, user, attackerRoll, defenderRoll, duelData["amount"], otherUserTry, timeNow, bot.factory.channel)
                 bot.execQueryModify("INSERT INTO duel_results (from_user, to_user, roll1, roll2, amount, winner, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", resultLogArgs)
@@ -146,10 +146,10 @@ def execute(parser, bot, user, args):
         elif defenderRoll > attackerRoll:
             winnerMsgArgs = (otherUserTry, attackerRoll, user, defenderRoll, user, duelData["amount"]*2, config.currencyPlural)
             bot.channelMsg("KevinTurtle KevinTurtle KevinTurtle | %s rolled a %d and %s rolled a %d. %s wins the %d %s! | KevinTurtle KevinTurtle KevinTurtle" % winnerMsgArgs)
-            loserBalArgs = (otherUserData["balance"] - duelData["amount"], timeNow, otherUserTry, otherUserData["balance"])
-            if bot.execQueryModify("UPDATE users SET balance = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", loserBalArgs) == 1:
-                winnerBalArgs = (userData["balance"] + duelData["amount"], timeNow, user, userData["balance"])
-                bot.execQueryModify("UPDATE users SET balance = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", winnerBalArgs)
+            loserBalArgs = (otherUserData["balance"] - duelData["amount"], timeNow, otherUserData["duel_profit"] - duelData["amount"], otherUserTry, otherUserData["balance"])
+            if bot.execQueryModify("UPDATE users SET balance = ?, last_activity = ?, duels_lost = duels_lost + 1, duel_profit = ? WHERE twitchname = ? AND balance = ?", loserBalArgs) == 1:
+                winnerBalArgs = (userData["balance"] + duelData["amount"], timeNow, userData["duel_profit"] + duelData["amount"], user, userData["balance"])
+                bot.execQueryModify("UPDATE users SET balance = ?, last_activity = ?, duels_won = duels_won + 1, duel_profit = ? WHERE twitchname = ? AND balance = ?", winnerBalArgs)
                 bot.updateHighestBalance(userData, userData["balance"]+duelData["amount"])
                 resultLogArgs = (otherUserTry, user, attackerRoll, defenderRoll, duelData["amount"], user, timeNow, bot.factory.channel)
                 bot.execQueryModify("INSERT INTO duel_results (from_user, to_user, roll1, roll2, amount, winner, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", resultLogArgs)
@@ -160,6 +160,7 @@ def execute(parser, bot, user, args):
             bot.channelMsg("KevinTurtle KevinTurtle KevinTurtle | %s rolled a %d and %s rolled a %d. Draw! No-one gains or loses anything. | KevinTurtle KevinTurtle KevinTurtle" % winnerMsgArgs)
             resultLogArgs = (otherUserTry, user, attackerRoll, defenderRoll, duelData["amount"], timeNow, bot.factory.channel)
             bot.execQueryModify("INSERT INTO duel_results (from_user, to_user, roll1, roll2, amount, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?, ?)", resultLogArgs)
+            bot.execQueryModify("UPDATE users SET last_activity = ?, duels_tied = duels_tied + 1 WHERE twitchname IN(?, ?)", (timeNow, otherUserTry, user))
             
         # done!
         bot.execQueryModify("DELETE FROM duel_requests WHERE from_user = ? AND to_user = ?", (otherUserTry, user))
