@@ -5,13 +5,12 @@ def execute(parser, bot, user, args):
         args = user
         
     arglist = args.split()
-    balanceCheck = bot.execQuerySelectOne("SELECT COUNT(*) FROM coinflips WHERE twitchname = ? AND winner = ?", (arglist[0].lower(), 0))
+    balanceCheck = bot.execQuerySelectOne("SELECT * FROM users WHERE twitchname = ?", (arglist[0].lower(),))
     if balanceCheck == None:
-        bot.channelMsg("%s -> Invalid argument." % user)
+        bot.channelMsg("%s -> %s hasn't played on Goldenrod yet." % (user, arglist[0].lower()))
     else:
-        loseCount = balanceCheck["COUNT(*)"]
-        winCount = bot.execQuerySelectOne("SELECT COUNT(*) FROM coinflips WHERE twitchname = ? AND winner = ?", (arglist[0].lower(), 1))["COUNT(*)"]
-        bot.channelMsg("%s -> %s has won coin flips %d times and lost %d times." % (user, arglist[0].lower(), winCount, loseCount))
+        msgArgs = (user, arglist[0].lower(), balanceCheck["coins_won"], balanceCheck["coins_lost"], balanceCheck["coin_profit"], config.currencyPlural)
+        bot.channelMsg("%s -> %s has won %d coin flips and lost %d. Their overall profit/loss from coin flips is %d %s." % msgArgs)
     
 def requiredPerm():
     return "anyone"
