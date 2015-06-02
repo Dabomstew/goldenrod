@@ -59,10 +59,15 @@ class GoldenrodNostalgiaB(irc.IRCClient):
     def execQueryModify(self, query, args=None):
         try:
             lock.acquire(True)
-            if(args == None):
-                self.cursor.execute(query)
-            else:
-                self.cursor.execute(query, args)
+            try:
+                if(args == None):
+                    self.cursor.execute(query)
+                else:
+                    self.cursor.execute(query, args)
+            except sqlite3.IntegrityError:
+                # do nothing because row already exists
+                self.conn.commit()
+                return 0
             rowc = self.cursor.rowcount
             self.conn.commit()
             return rowc
