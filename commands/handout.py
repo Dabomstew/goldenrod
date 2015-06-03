@@ -90,7 +90,7 @@ def execute(parser, bot, user, args):
         handout = 0
         while True:
             if saidPlease:
-                randRoll = random.randint(3, 10)
+                randRoll = max(random.randint(1, 10), random.randint(1, 7))
             else:
                 randRoll = random.randint(1, 10)
             handout = handout + randRoll

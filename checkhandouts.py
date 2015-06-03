@@ -8,7 +8,8 @@ genwunmisses = 0
 for i in xrange(1, 1000001):
     handout = 0
     while True:
-        randRoll = random.randint(1, 10)
+        randRoll = max(random.randint(1, 10), random.randint(1, 7))
+        #randRoll = random.randint(1, 10)
         handout = handout + randRoll
         if randRoll != 10:
             break
