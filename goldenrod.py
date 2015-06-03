@@ -195,6 +195,12 @@ class GoldenrodNostalgiaB(irc.IRCClient):
             if not self.commandsEnabled and user == self.factory.channel and user != config.botOwner:
                 if not msg.startswith("%sgoldenrodctl" % config.cmdChar):
                     return
+            if random.randint(1, 8192) == 6969:
+                self.channelMsg("/me *** %s's MESSAGE WAS SHINIED! THEY WIN %d %s. ***" % (user.upper(), config.shinyPrize, config.currencyPlural.upper()))
+                userData = self.getUserDetails(user)
+                self.execQueryModify("INSERT INTO shinies (twitchname, reward, whenHappened, channel) VALUES(?, ?, ?, ?)", (user, config.shinyPrize, int(time.time()), self.factory.channel))
+                self.execQueryModify("UPDATE users SET balance = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", (userData["balance"]+config.shinyPrize, int(time.time()), user, userData["balance"]))
+            
             if self.contestManager.currentContest != None:
                 self.contestManager.currentContest.processMessage(user, msg)
             if msg.startswith(config.cmdChar):
