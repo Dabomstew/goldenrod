@@ -36,8 +36,12 @@ def handoutsdev(diffs, number):
     
 def execute(parser, bot, user, args):
     argslow = args.lower().strip()
-    saidPlease = argslow.startswith("please") or argslow.startswith("pls") or argslow.startswith("plz")
-    #saidPlease = False # lol
+    
+    saidPlease = False
+    for keyword in config.magicWords:
+        if keyword in argslow:
+            saidPlease = True
+    
     userData = bot.getUserDetails(user)
     
     timeNow = int(time.time())
@@ -86,7 +90,7 @@ def execute(parser, bot, user, args):
         handout = 0
         while True:
             if saidPlease:
-                randRoll = random.randint(2, 10)
+                randRoll = random.randint(3, 10)
             else:
                 randRoll = random.randint(1, 10)
             handout = handout + randRoll
