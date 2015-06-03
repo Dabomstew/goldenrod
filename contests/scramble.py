@@ -105,7 +105,10 @@ class Game:
                         elapsedTime = int(time.time()) - self.startTime
                         prize = self.calcPrize(self.word, elapsedTime)
                         
-                        self.bot.channelMsg("%s guessed %s correctly first! They win %d %s." % (user, self.word, prize, config.currencyPlural))
+                        emote = random.choice(["Kreygasm", "KevinTurtle", "TriHard"])
+                        emotewall = " ".join([emote]*3)
+                        
+                        self.bot.channelMsg("/me %s | %s guessed %s correctly first! They win %d %s. | %s" % (emotewall, user, self.word, prize, config.currencyPlural, emotewall))
                         userData = self.bot.getUserDetails(user)
                         
                         theirNewBal = userData["balance"] + prize
@@ -119,4 +122,6 @@ class Game:
                     
     
     def end(self):
-        self.bot.channelMsg("No-one guessed correctly, the correct answer was %s. Too bad!" % self.word)
+        emote = random.choice(["BibleThump"], ":(")
+        emotewall = " ".join([emote]*3)
+        self.bot.channelMsg("/me %s | No-one guessed correctly, the correct answer was %s. Too bad! | %s" % (emotewall, self.word, emotewall))

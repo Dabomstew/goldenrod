@@ -40,9 +40,11 @@ class Game:
                 self.guesses.append(newGuess)
     
     def end(self):
+        emote = random.choice(["Kreygasm", "KevinTurtle", "TriHard"])
+        emotewall = " ".join([emote]*3)
         for guess in self.guesses:
             if guess[1] == self.number:
-                self.bot.channelMsg("%s guessed %d correctly first! They win %d %s." % (guess[0], guess[1], config.guessPrize, config.currencyPlural))
+                self.bot.channelMsg("/me %s | %s guessed %d correctly first! They win %d %s. | %s" % (emotewall, guess[0], guess[1], config.guessPrize, config.currencyPlural, emotewall))
                 userData = self.bot.getUserDetails(guess[0])
                 theirNewBal = userData["balance"] + config.guessPrize
                 queryArgList = (theirNewBal, guess[0], userData["balance"])
@@ -59,7 +61,7 @@ class Game:
         if closestScore != 99999999:
             for guess in self.guesses:
                 if abs(self.number - guess[1]) == closestScore:
-                    self.bot.channelMsg("%s's guess of %d was the closest. They win the consolation prize of %d %s." % (guess[0], guess[1], config.guessPrizeConsolation, config.currencyPlural))
+                    self.bot.channelMsg("/me %s | %s's guess of %d was the closest. They win the consolation prize of %d %s. | %s" % (emotewall, guess[0], guess[1], config.guessPrizeConsolation, config.currencyPlural, emotewall))
                     userData = self.bot.getUserDetails(guess[0])
                     theirNewBal = userData["balance"] + config.guessPrizeConsolation
                     queryArgList = (theirNewBal, guess[0], userData["balance"])

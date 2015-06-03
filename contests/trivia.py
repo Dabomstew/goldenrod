@@ -67,8 +67,11 @@ class Game:
                 if wonCheck != None:
                     prize = int(prize/2)
                     
-                msgArgs = (user, msglower, diffName, elapsedTime, prize, config.currencyPlural)
-                self.bot.channelMsg("%s's answer of %s was correct! For answering a %s question in %d seconds they gain %d %s." % msgArgs)
+                emote = random.choice(["Kreygasm", "KevinTurtle", "TriHard"])
+                emotewall = " ".join([emote]*3)
+                
+                msgArgs = (emotewall, user, msglower, diffName, elapsedTime, prize, config.currencyPlural, emotewall)
+                self.bot.channelMsg("/me %s | %s's answer of %s was correct! For answering a %s question in %d seconds they gain %d %s. | %s" % msgArgs)
                 userData = self.bot.getUserDetails(user)
                 
                 theirNewBal = userData["balance"] + prize
@@ -84,4 +87,6 @@ class Game:
                     
     
     def end(self):
-        self.bot.channelMsg("No-one answered correctly. Too bad! Try again next time.")
+        emote = random.choice(["BibleThump"], ":(")
+        emotewall = " ".join([emote]*3)
+        self.bot.channelMsg("/me %s | No-one answered correctly. Too bad! Try again next time. | %s" % (emotewall, emotewall))
