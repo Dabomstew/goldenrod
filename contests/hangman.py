@@ -75,7 +75,7 @@ class Game:
                                     allRevealed = False
                             
                             if allRevealed:
-                                emote = random.choice(["BibleThump"], ":(")
+                                emote = random.choice(["BibleThump", ":("])
                                 emotewall = " ".join([emote]*3)
                                 self.bot.channelMsg("/me %s | Sorry everyone, the whole word got revealed before anyone guessed it. Better luck next time! | %s" % (emotewall, emotewall))
                                 self.contestmanager.contestIsDone()
@@ -120,6 +120,6 @@ class Game:
                     
     
     def end(self):
-        emote = random.choice(["BibleThump"], ":(")
+        emote = random.choice(["BibleThump", ":("])
         emotewall = " ".join([emote]*3)
         self.bot.channelMsg("/me %s | No-one guessed correctly, the correct answer was %s. Too bad! | %s" % (emotewall, self.word, emotewall))

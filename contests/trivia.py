@@ -87,6 +87,6 @@ class Game:
                     
     
     def end(self):
-        emote = random.choice(["BibleThump"], ":(")
+        emote = random.choice(["BibleThump", ":("])
         emotewall = " ".join([emote]*3)
         self.bot.channelMsg("/me %s | No-one answered correctly. Too bad! Try again next time. | %s" % (emotewall, emotewall))
