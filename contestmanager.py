@@ -68,8 +68,10 @@ class ContestManager:
                 self.currentContest = self.contestModules[contestName].Game(self)
                 self.currentContest.start()
                 currtime = self.unixTimestamp()
-                self.startNextContest = currtime + config.contestInterval
-                self.endCurrentContest = currtime + config.contestDurations[contestName]
+                interval = config.contestInterval
+                self.startNextContest = currtime + interval + random.randint(-interval/10, interval/10)
+                duration = config.contestDurations[contestName]
+                self.endCurrentContest = currtime + duration
                 return
             else:
                 # nope, check the others

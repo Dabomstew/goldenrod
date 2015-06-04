@@ -42,6 +42,16 @@ class Game:
                 numberguess = int(msglow)
                 if numberguess < config.lotteryMinNumber or numberguess > config.lotteryMaxNumber:
                     return
+                    
+                if "bot" in user:
+                    self.bot.channelMsg("%s -> LOL nope." % user)
+                    return
+                    
+                altCheck = self.bot.execQuerySelectOne("SELECT * FROM alts WHERE twitchname = ?", (user,))
+                
+                if altCheck != None:
+                    self.bot.channelMsg("%s -> Known alts aren't allowed to play games." % user)
+                    return
                 
                 if user in self.guessers and self.guessers[user] > timeNow - config.lotteryGuessTimeout:
                     self.bot.channelMsg("%s -> Stop spamming guesses." % user)
