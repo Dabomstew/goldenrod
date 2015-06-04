@@ -38,7 +38,7 @@ def execute(parser, bot, user, args):
     argslow = args.lower().strip()
     
     saidPlease = False
-    words = args.split()
+    words = argslow.split()
     if len(words) >= 1:
         for keyword in config.magicWords:
             if keyword == words[0]:
