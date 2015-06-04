@@ -60,7 +60,7 @@ class Game:
                     queryArgList = (theirNewBal, user, userData["balance"])
                     self.bot.execQueryModify("UPDATE users SET balance = ?, contests_won = contests_won + 1 WHERE twitchname = ? AND balance = ?", queryArgList)
                     self.bot.updateHighestBalance(userData, theirNewBal)
-                    logArgList = (user, "luckylottery", self.word, prize, timeNow, self.bot.factory.channel)
+                    logArgList = (user, "luckylottery", self.presentNumber(self.number, config.lotteryMaxNumber), prize, timeNow, self.bot.factory.channel)
                     self.bot.execQueryModify("INSERT INTO contestwins (twitchname, gameid, answer, reward, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?)", logArgList)
                     self.contestmanager.contestIsDone()
                     return
