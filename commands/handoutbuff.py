@@ -13,7 +13,7 @@ def execute(parser, bot, user, args):
     else:
         cmdlisttime = newluckypls
     
-    bot.channelMsg("Fed up by 1-point handouts? Find the magic word to include in your !handout message to get a buff to the possible handouts. The word will change periodically. Current clue: Pretty much universally loved by Twitch users.")
+    bot.channelMsg("Fed up by 1-point handouts? Find the magic word to include in your !handout message to get a buff to the possible handouts. The word will change periodically. Current clue: %s" % config.handoutBuffClue)
         
 def requiredPerm():
     return "anyone"
