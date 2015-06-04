@@ -28,7 +28,7 @@ class Game:
     def start(self):
         self.number = random.randint(config.lotteryMinNumber, config.lotteryMaxNumber)
         print self.number
-        msgArgs = (self.presentNumber(config.lotteryMinNumber, config.lotteryMaxNumber), self.presentNumber(config.lotteryMaxNumber, config.lotteryMaxNumber), config.lotteryGuessTimeout, config.lotteryPrize, config.currencyPlural, config.contestDuration)
+        msgArgs = (self.presentNumber(config.lotteryMinNumber, config.lotteryMaxNumber), self.presentNumber(config.lotteryMaxNumber, config.lotteryMaxNumber), config.lotteryGuessTimeout, config.lotteryPrize, config.currencyPlural, config.contestDurations["luckylottery"])
         self.bot.channelMsg("Goldenrod Lottery! I have chosen a random trainer ID between %s and %s. Have a go at guessing the number in a message and I'll tell you how many digits from your guess match the digit in the same position in the answer. You can guess once every %d seconds. The winner gets %d %s and you have %d seconds. Good luck!" % msgArgs)
         
     def processMessage(self, user, message):

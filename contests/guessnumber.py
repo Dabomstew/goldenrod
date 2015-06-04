@@ -16,7 +16,7 @@ class Game:
     def start(self):
         self.number = random.randint(config.guessMinNumber, config.guessMaxNumber)
         print self.number
-        msgArgs = (config.guessMinNumber, config.guessMaxNumber, config.guessPrize, config.currencyPlural, config.contestDuration)
+        msgArgs = (config.guessMinNumber, config.guessMaxNumber, config.guessPrize, config.currencyPlural, config.contestDurations["guessnumber"])
         self.bot.channelMsg("Guess The Number! I have chosen a random number between %d and %d. Put in your guess with !guess number. If you guess correctly you win %d %s and if no-one guesses correctly the closest gets a consolation prize. You have %d seconds. Good luck!" % msgArgs)
         
     def processMessage(self, user, message):

@@ -63,3 +63,4 @@ oldstuff/
 *.rar
 *.zip
 logs/
+nohup.out
