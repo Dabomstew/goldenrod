@@ -38,10 +38,12 @@ def execute(parser, bot, user, args):
     argslow = args.lower().strip()
     
     saidPlease = False
-    for keyword in config.magicWords:
-        if keyword in argslow:
-            saidPlease = True
-    
+    words = args.split()
+    if len(words) >= 1:
+        for keyword in config.magicWords:
+            if keyword == words[0]:
+                saidPlease = True
+
     userData = bot.getUserDetails(user)
     
     timeNow = int(time.time())

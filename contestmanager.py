@@ -69,7 +69,7 @@ class ContestManager:
                 self.currentContest.start()
                 currtime = self.unixTimestamp()
                 self.startNextContest = currtime + config.contestInterval
-                self.endCurrentContest = currtime + config.contestDuration
+                self.endCurrentContest = currtime + config.contestDurations[contestName]
                 return
             else:
                 # nope, check the others

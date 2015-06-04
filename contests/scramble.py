@@ -71,7 +71,7 @@ class Game:
             self.word = wordData["word"].encode("utf-8").lower()
         print self.word
         self.scrambledWord = self.shuffleWord(self.word)
-        msgArgs = (self.calcPrize(self.word, 0), config.currencyPlural, config.contestDuration)
+        msgArgs = (self.calcPrize(self.word, 0), config.currencyPlural, config.contestDurations["scramble"])
         self.bot.channelMsg("Word scramble! I have chosen a random word from my collection of Pokemon and Pokemon speedrunning-related terms and scrambled it. The first person to guess this word gets %d %s, with some taken off if it takes too long (to discourage cheating). You have %d seconds. Good luck!" % msgArgs)
         self.bot.channelMsg("Kappa Kappa Kappa | The word is: %s | Kappa Kappa Kappa" % self.scrambledWord)
         

@@ -36,7 +36,7 @@ class Game:
         self.bot.execQueryModify("UPDATE hangman_words SET used_in_cycle = 1 WHERE id = ?", (wordData["id"],))
         self.word = wordData["word"].encode("utf-8").lower()
         print self.word
-        msgArgs = (config.hangmanPrizeBase, config.currencyPlural, config.hangmanPrizeLetterReduction, config.contestDuration)
+        msgArgs = (config.hangmanPrizeBase, config.currencyPlural, config.hangmanPrizeLetterReduction, config.contestDurations["hangman"])
         self.bot.channelMsg("Hangman! I have chosen a random word from my collection of Pokemon and Pokemon speedrunning-related terms and the first person to guess the word gets %d %s, minus %d for each unique letter guessed before the successful guess. You can guess either a single letter (e.g. !guess a) or an answer (e.g. !guess bulbasaur), both with !guess. You only get one guess at the full word, but you'll be let off if your guess isn't the right length or doesn't match the letters revealed so far. You have %d seconds. Good luck!" % msgArgs)
         self.printWord()
         
