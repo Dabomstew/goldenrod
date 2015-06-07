@@ -37,6 +37,10 @@ def handoutsdev(diffs, number):
 def execute(parser, bot, user, args):
     argslow = args.lower().strip()
     
+    if config.botOwner in argslow:
+        bot.channelMsg("%s -> How cute, you think begging is actually going to work." % user)
+        return
+    
     saidPlease = False
     words = argslow.split()
     if len(words) >= 1:
