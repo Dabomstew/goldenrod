@@ -200,6 +200,11 @@ class GoldenrodNostalgiaB(irc.IRCClient):
                 userData = self.getUserDetails(user)
                 self.execQueryModify("INSERT INTO shinies (twitchname, reward, whenHappened, channel) VALUES(?, ?, ?, ?)", (user, config.shinyPrize, int(time.time()), self.factory.channel))
                 self.execQueryModify("UPDATE users SET balance = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", (userData["balance"]+config.shinyPrize, int(time.time()), user, userData["balance"]))
+                if user == self.factory.channel:
+                    self.channelMsg("/me Strimmer got a shiny? DansGame R I G G E D DansGame")
+                
+                if user == config.botOwner:
+                    self.channelMsg("/me The owner got a shiny? DansGame DansGame DansGame 1 0 0 % R I G G E D DansGame DansGame DansGame")
             
             if self.contestManager.currentContest != None:
                 self.contestManager.currentContest.processMessage(user, msg)
