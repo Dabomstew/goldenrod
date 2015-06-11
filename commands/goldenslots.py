@@ -2,6 +2,7 @@ import config
 import random
 import datetime, time
 import math
+from twisted.internet import reactor
 
 slotsReelOne = ["7", "Pika", "Karp", "BAR", "Cherry", "7", "Karp", "Diglett", "BAR", "Cherry", "7", "Pika", "Diglett", "BAR", "Cherry", "7", "Pika", "Karp"]
 slotsReelTwo = ["7", "Karp", "Cherry", "Diglett", "Pika", "BAR", "Cherry", "Karp", "Diglett", "Cherry", "BAR", "Karp", "Diglett", "Cherry", "Pika", "7", "Karp", "Cherry"]
@@ -73,8 +74,7 @@ def execute(parser, bot, user, args):
         else:
             bot.channelMsg("%s -> The slots cost 5 %s to play, you don't have enough." % (user, config.currencyPlural))
     else:
-        if config.showCooldowns:
-            bot.channelMsg("%s -> On cooldown. (%d secs)" % (user, canPlay))
+        reactor.whisperer.sendWhisper(user, "On cooldown. (%d secs)" % canPlay)
     
 def requiredPerm():
     return "anyone"

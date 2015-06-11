@@ -4,6 +4,7 @@ import config
 import random
 import datetime, time
 import math
+from twisted.internet import reactor
 
 def thinpurgeise(str):
     universion = str.decode('utf-8')
@@ -119,7 +120,10 @@ def execute(parser, bot, user, args):
         logArgs = (user, handout, timeNow, bot.factory.channel)
         bot.execQueryModify("INSERT INTO handouts (twitchname, amount, whenHappened, channel) VALUES(?, ?, ?, ?)", logArgs)
         
-        bot.channelMsg("%s -> %s" % (user, random.choice(handoutMessages)))
+        if handout > 20 or handout == 0:
+            bot.channelMsg("%s -> %s" % (user, random.choice(handoutMessages)))
+        else:
+            reactor.whisperer.sendWhisper(user, random.choice(handoutMessages))
         
         if handout > 60:
             bot.channelMsg("Congratulations %s! You should probably go buy a lottery ticket..." % user)
@@ -128,8 +132,7 @@ def execute(parser, bot, user, args):
         elif handout > 40:
             bot.channelMsg("40 points, not bad at all %s. But would you have preferred to use that luck on a shiny?" % user)
     else:
-        if config.showCooldowns:
-            bot.channelMsg("%s -> On cooldown. (%d secs)" % (user, canPlay))
+        reactor.whisperer.sendWhisper(user, "On cooldown. (%d secs)" % canPlay)
     
 def requiredPerm():
     return "anyone"

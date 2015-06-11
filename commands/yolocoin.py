@@ -1,6 +1,7 @@
 import config
 import random
 import datetime, time
+from twisted.internet import reactor
 
 def execute(parser, bot, user, args):
     userData = bot.getUserDetails(user)
@@ -37,8 +38,7 @@ def execute(parser, bot, user, args):
         else:
             bot.channelMsg("%s -> No %s to gamble." % (user, config.currencyPlural))
     else:
-        if config.showCooldowns:
-            bot.channelMsg("%s -> On cooldown. (%d secs)" % (user, canPlay))
+        reactor.whisperer.sendWhisper(user, "On cooldown. (%d secs)" % canPlay)
     
 def requiredPerm():
     return "anyone"

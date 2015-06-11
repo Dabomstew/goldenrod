@@ -14,6 +14,7 @@ import config
 import random
 import sqlite3
 import channelmanager
+import whisperbot
 
 commandParser = None
 channelManager = None
@@ -260,6 +261,15 @@ def connectToTwitch(startChannel, commandParser, waitTimeout):
     myServer = random.choice(twitchServers)
     reactor.connectTCP(myServer, 6667, f)
     
+def connectWhisperer(waitTimeout):
+    if waitTimeout > 0:
+        time.sleep(waitTimeout)
+    f = whisperbot.WhisperFactory(waitTimeout, conn, cursor, lock)
+    # connect factory to this host and port
+    twitchGroupServers = ["199.9.253.119", "199.9.253.120"]
+    myServer = random.choice(twitchGroupServers)
+    reactor.connectTCP(myServer, 6667, f)
+    
 class GoldenrodFactory(protocol.ClientFactory):
 
     def __init__(self, channel, commandParser, waitTimeout):
@@ -385,6 +395,7 @@ if __name__ == '__main__':
     reactor.commandParser = commandParser
     
     connectToTwitch(config.botNick, commandParser, 0)
+    connectWhisperer(0)
 
     # setup channel manager
     channelManager = channelmanager.ChannelManager(conn, cursor, lock, channelInstances)
