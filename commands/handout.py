@@ -97,7 +97,7 @@ def execute(parser, bot, user, args):
         handout = 0
         while True:
             doContinue = False
-            if handout > 10:
+            if handout >= 10:
                 randRoll = random.randint(0, 10)
                 doContinue = (randRoll == 10) or (random.randint(1, 100) == 1) # preserve 1/10 chance of continuing [1/11 + 10/11*1/100]
             else:
