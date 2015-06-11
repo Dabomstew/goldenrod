@@ -96,12 +96,21 @@ def execute(parser, bot, user, args):
         # success
         handout = 0
         while True:
-            if saidPlease:
-                randRoll = max(random.randint(1, 10), random.randint(1, 7))
+            doContinue = False
+            if handout > 10:
+                randRoll = random.randint(0, 10)
+                doContinue = (randRoll == 10) or (random.randint(1, 100) == 1) # preserve 1/10 chance of continuing [1/11 + 10/11*1/100]
             else:
                 randRoll = random.randint(1, 10)
-            handout = handout + randRoll
-            if randRoll != 10:
+                doContinue = (randRoll == 10)
+            
+            if saidPlease:
+                randRoll = max(randRoll, random.randint(0, 8))
+            
+            if doContinue:
+                handout = handout + 10
+            else:
+                handout = handout + randRoll
                 break
                 
         currencyNow = config.currencyName if (handout == 1) else config.currencyPlural
