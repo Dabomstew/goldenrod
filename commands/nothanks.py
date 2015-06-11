@@ -9,3 +9,7 @@ def execute(parser, bot, user, args):
     
 def requiredPerm():
     return "broadcaster"
+    
+def canUseByWhisper():
+    return False
+

@@ -24,40 +24,40 @@ def taxOn(amount):
 
 def execute(parser, bot, user, args):
     if "bot" in user:
-        bot.channelMsg("%s -> LOL nope." % user)
+        bot.addressUser(user, "LOL nope.")
         return
         
     altCheck = bot.execQuerySelectOne("SELECT * FROM alts WHERE twitchname = ?", (user,))
     
     if altCheck != None:
-        bot.channelMsg("%s -> Known alts aren't allowed to donate." % user)
+        bot.addressUser(user, "Known alts aren't allowed to donate.")
         return
         
     userData = bot.getUserDetails(user)
     arglist = args.split()
     if len(arglist) < 2:
-        bot.channelMsg("%s -> Invalid arguments. Use %sdonate user amount" % (user, config.cmdChar))
+        bot.addressUser(user, "Invalid arguments. Use %sdonate user amount" % config.cmdChar)
         return
     
     timeNow = int(time.time())
     try:
         amount = int(arglist[1])
     except ValueError:
-        bot.channelMsg("%s -> Invalid amount to donate." % user)
+        bot.addressUser(user, "Invalid amount to donate.")
         return
      
     if amount <= 0 or amount > userData["balance"]:
-        bot.channelMsg("%s -> Invalid amount to donate." % user)
+        bot.addressUser(user, "Invalid amount to donate.")
         return
         
     otherUserTry = arglist[0].lower()
     
     if otherUserTry == user:
-        bot.channelMsg("%s -> You can't donate to yourself." % user)
+        bot.addressUser(user, "You can't donate to yourself.")
         return
         
     if otherUserTry in user or user in otherUserTry:
-        bot.channelMsg("%s -> Try harder please." % user)
+        bot.addressUser(user, "Try harder please.")
         return
         
     historyRow = bot.execQuerySelectOne("SELECT COALESCE(SUM(amount),0) AS totalDonated FROM donations WHERE fromPlayer = ? AND toPlayer = ? AND whenHappened >= ?", (user, otherUserTry, timeNow - 86400*2))
@@ -71,7 +71,7 @@ def execute(parser, bot, user, args):
     
     otherUser = bot.execQuerySelectOne("SELECT * FROM users WHERE twitchname = ?", (otherUserTry,))
     if otherUser == None:
-        bot.channelMsg("%s -> %s hasn't played on Goldenrod yet." % (user, otherUserTry))
+        bot.addressUser(user, "%s hasn't played on Goldenrod yet." % otherUserTry)
     else:
         theirNewBal = otherUser["balance"] + taxedAmount
         ourNewBal = userData["balance"] - amount
@@ -80,12 +80,16 @@ def execute(parser, bot, user, args):
             secondArgList = (theirNewBal, otherUserTry, otherUser["balance"])
             bot.execQueryModify("UPDATE users SET balance = ? WHERE twitchname = ? AND balance = ?", secondArgList)
             bot.updateHighestBalance(otherUser, theirNewBal)
-            outputList = (user, amount, config.currencyName if (amount == 1) else config.currencyPlural, otherUserTry, taxedAmount, config.currencyName if (taxedAmount == 1) else config.currencyPlural)
-            bot.channelMsg("%s -> Donated %d %s to %s, they received %d %s." % outputList)
+            outputList = (amount, config.currencyName if (amount == 1) else config.currencyPlural, otherUserTry, taxedAmount, config.currencyName if (taxedAmount == 1) else config.currencyPlural)
+            bot.addressUser(user, "Donated %d %s to %s, they received %d %s." % outputList)
             logArgs = (user, otherUserTry, amount, int(time.time()), bot.factory.channel)
             bot.execQueryModify("INSERT INTO donations (fromPlayer, toPlayer, amount, whenHappened, channel) VALUES(?, ?, ?, ?, ?)", logArgs)
         else:
-            bot.channelMsg("%s -> Donation failed." % user)
+            bot.addressUser(user, "Donation failed.")
     
 def requiredPerm():
     return "anyone"
+    
+def canUseByWhisper():
+    return False
+

@@ -5,3 +5,7 @@ def execute(parser, bot, user, args):
 
 def requiredPerm():
     return "owner"  
+    
+def canUseByWhisper():
+    return False
+

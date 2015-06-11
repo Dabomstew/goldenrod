@@ -42,11 +42,11 @@ class CommandParser:
         # do nothing
         return  
     
-    def parse(self, bot, user, command, args):
+    def parse(self, bot, user, command, args, fromWhisperer):
         # parse it lol
         command = command.lower()
         args = args.strip()
-        if command in self.commandMethods:
+        if command in self.commandMethods and (not fromWhisperer or self.commandMethods[command].canUseByWhisper()):
             if self.checkPerms(bot, user, self.commandMethods[command].requiredPerm()):
                 self.commandMethods[command].execute(self, bot, user, args)
         

@@ -3,14 +3,19 @@ import goldenrod
 import config
 
 def execute(parser, bot, user, args):
-    if not parser.checkPerms(bot, user, "owner") or bot.factory.channel != config.botNick:
+    if not parser.checkPerms(bot, user, "owner") or not bot.isWhisperRequest():
         return
     newChannel = args.split()[0].strip().lower()
     if newChannel == "":
         return
     goldenrod.removeFromCommandsEnabled(newChannel)
-    bot.channelMsg("%s -> Disabled commands on %s." % (user, newChannel))
+    bot.addressUser(user, "Disabled commands on %s." % newChannel)
     
 def requiredPerm():
     return "owner"
+    
+def canUseByWhisper():
+    return True
+
+
     

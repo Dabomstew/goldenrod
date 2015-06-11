@@ -3,7 +3,7 @@ import goldenrod, config
 import datetime, time
 
 def execute(parser, bot, user, args):
-    if not parser.checkPerms(bot, user, "owner") or bot.factory.channel != config.botNick:
+    if not parser.checkPerms(bot, user, "owner") or not bot.isWhisperRequest():
         return
     newChannel = args.split()[0].strip().lower()
     if newChannel == "":
@@ -13,8 +13,13 @@ def execute(parser, bot, user, args):
         bot.execQueryModify("INSERT INTO channels (channel, commandsEnabled, lastChange, joinIfLive) VALUES(?, ?, ?, ?)", (newChannel, True, int(time.time()), True))
     else:
         bot.execQueryModify("UPDATE channels SET joinIfLive = ?, lastChange = ? WHERE channel = ?", (True, int(time.time()), newChannel))
-    bot.channelMsg("%s -> Set channel %s to be joined when live." % (user, newChannel))
+    bot.addressUser(user, "Set channel %s to be joined when live." % newChannel)
     
 def requiredPerm():
     return "owner"
+    
+def canUseByWhisper():
+    return True
+
+
     

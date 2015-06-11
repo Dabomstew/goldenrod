@@ -5,20 +5,20 @@ import math
 
 def execute(parser, bot, user, args):
     if "bot" in user:
-        bot.channelMsg("%s -> LOL nope." % user)
+        bot.addressUser(user, "LOL nope.")
         return
         
     altCheck = bot.execQuerySelectOne("SELECT * FROM alts WHERE twitchname = ?", (user,))
     
     if altCheck != None:
-        bot.channelMsg("%s -> Known alts aren't allowed to participate in duels." % user)
+        bot.addressUser(user, "Known alts aren't allowed to participate in duels.")
         return
         
     userData = bot.getUserDetails(user)
     timeNow = int(time.time())
     
     if args == None or args.strip() == "":
-        bot.channelMsg("%s -> See %scommands to get the list of things you can do with %sduel." % (user, config.cmdChar, config.cmdChar))
+        bot.addressUser(user, "See %scommands to get the list of things you can do with %sduel." % (config.cmdChar, config.cmdChar))
         return
         
     bot.execQueryModify("DELETE FROM duel_requests WHERE expiry <= ?", (timeNow,))
@@ -30,14 +30,14 @@ def execute(parser, bot, user, args):
         # check duels
         myDuels = bot.execQuerySelectMultiple("SELECT * FROM duel_requests WHERE to_user = ? ORDER BY whenHappened ASC", (user,))
         if len(myDuels) == 0:
-            bot.channelMsg("%s -> You have no pending duel challenges." % user)
+            bot.addressUser(user, "You have no pending duel challenges.")
         else:
-            finalMessage = "%s -> You have %d pending duel challenges: " % (user, len(myDuels))
+            finalMessage = "You have %d pending duel challenges: " % (len(myDuels))
             for duel in myDuels:
                 finalMessage = "%s%s - %d %s, " % (finalMessage, duel["from_user"], duel["amount"], config.currencyName if (duel["amount"] == 1) else config.currencyPlural)
             
             finalMessage = finalMessage[:-2]
-            bot.channelMsg(finalMessage.encode("utf-8"))
+            bot.addressUser(user, finalMessage.encode("utf-8"))
             
     elif arglist[0] == "challenge":
         # challenges are on cooldown
@@ -45,44 +45,44 @@ def execute(parser, bot, user, args):
         if canPlay == 0:
             # do shit
             if len(arglist) < 3:
-                bot.channelMsg("%s -> Invalid challenge (use %sduel challenge user amount)" % (user, config.cmdChar))
+                bot.addressUser(user, "Invalid challenge (use %sduel challenge user amount)" % config.cmdChar)
                 return
             try:
                 amount = int(arglist[2])
             except ValueError:
-                bot.channelMsg("%s -> Invalid amount to challenge for." % user)
+                bot.addressUser(user, "Invalid amount to challenge for.")
                 return
             if amount <= 0 or amount > userData["balance"]:
-                bot.channelMsg("%s -> Invalid amount to challenge for." % user)
+                bot.addressUser(user, "Invalid amount to challenge for.")
                 return
             otherUserTry = arglist[1]
             if "bot" in otherUserTry:
-                bot.channelMsg("%s -> You can't challenge bots." % user)
+                bot.addressUser(user, "You can't challenge bots.")
                 return
             if otherUserTry == user:
-                bot.channelMsg("%s -> You can't challenge yourself." % user)
+                bot.addressUser(user, "You can't challenge yourself.")
                 return
             if otherUserTry in user or user in otherUserTry:
-                bot.channelMsg("%s -> Try harder please." % user)
+                bot.addressUser(user, "Try harder please.")
                 return
             otherAltCheck = bot.execQuerySelectOne("SELECT * FROM alts WHERE twitchname = ?", (otherUserTry,))
     
             if otherAltCheck != None:
-                bot.channelMsg("%s -> You can't challenge a known alt to a duel." % user)
+                bot.addressUser(user, "You can't challenge a known alt to a duel.")
                 return
                 
             otherUser = bot.execQuerySelectOne("SELECT * FROM users WHERE twitchname = ?", (otherUserTry,))
             if otherUser == None:
-                bot.channelMsg("%s -> %s hasn't played on Goldenrod yet." % (user, otherUserTry))
+                bot.addressUser(user, "%s hasn't played on Goldenrod yet." % otherUserTry)
                 return
             else:
                 if otherUser["balance"] < amount:
-                    bot.channelMsg("%s -> %s doesn't have enough %s to accept your challenge." % (user, otherUserTry, config.currencyPlural))
+                    bot.addressUser(user, "%s doesn't have enough %s to accept your challenge." % (otherUserTry, config.currencyPlural))
                     return
                     
                 otherDuelCheck = bot.execQuerySelectOne("SELECT * FROM duel_requests WHERE (from_user = ? AND to_user = ?) OR (from_user = ? AND to_user = ?) LIMIT 1", (user, otherUserTry, otherUserTry, user))
                 if otherDuelCheck != None:
-                    bot.channelMsg("%s -> There is already a pending duel between you and %s." % (user, otherUserTry))
+                    bot.addressUser(user, "There is already a pending duel between you and %s." % otherUserTry)
                     return
                 
                 # perfect, issue the challenge
@@ -92,17 +92,15 @@ def execute(parser, bot, user, args):
                 cdArgs = (timeNow, timeNow, user)
                 bot.execQueryModify("UPDATE users SET last_game = ?, last_activity = ? WHERE twitchname = ?", cdArgs)
                 # acknowledge the request in chat
-                bot.channelMsg("%s -> You have issued the %d %s duel request to %s." % (user, amount, config.currencyName, otherUserTry))
-                challengerMsgArgs = (otherUserTry, user, amount, config.currencyName if (amount == 1) else config.currencyPlural, config.cmdChar, user, config.cmdChar, user)
-                bot.channelMsg("%s -> %s has challenged you to a duel for %d %s! Use %sduel accept %s to accept the request or %sduel reject %s to reject it." % challengerMsgArgs)
-                
+                bot.addressUser(user, "You have issued the %d %s duel request to %s." % (amount, config.currencyName, otherUserTry))
+                challengerMsgArgs = (user, amount, config.currencyName if (amount == 1) else config.currencyPlural, config.cmdChar, user, config.cmdChar, user)
+                bot.addressUser(otherUserTry, "%s has challenged you to a duel for %d %s! Use %sduel accept %s to accept the request or %sduel reject %s to reject it." % challengerMsgArgs)
         else:
-            if config.showCooldowns:
-                bot.channelMsg("%s -> On cooldown. (%d secs)" % (user, canPlay))
+            reactor.whisperer.sendWhisper(user, "On cooldown. (%d secs)" % canPlay)
             
     elif arglist[0] == "accept":
         if len(arglist) < 2:
-            bot.channelMsg("%s -> You didn't specify a user to accept the challenge from." % user)
+            bot.addressUser(user, "You didn't specify a user to accept the challenge from.")
             return
         
         otherUserTry = arglist[1]
@@ -110,20 +108,21 @@ def execute(parser, bot, user, args):
         duelData = bot.execQuerySelectOne("SELECT * FROM duel_requests WHERE from_user = ? AND to_user = ?", (otherUserTry, user))
         
         if duelData == None:
-            bot.channelMsg("%s -> You don't have a pending challenge from %s. Use %sduel list to check your pending challenges." % (user, otherUserTry, config.cmdChar))
+            bot.addressUser(user, "You don't have a pending challenge from %s. Use %sduel list to check your pending challenges." % (otherUserTry, config.cmdChar))
             return
         
         if duelData["amount"] > userData["balance"]:
+            bot.addressUser(user, "You no longer have enough %s to accept this duel. Rejecting it instead..." % config.currencyPlural)
             bot.channelMsg("%s -> You no longer have enough %s to accept this duel. Rejecting it instead..." % (user, config.currencyPlural))
-            bot.channelMsg("%s -> %s was forced to reject your duel request due to not having enough %s left." % (otherUserTry, user, config.currencyPlural))
+            bot.addressUser(otherUserTry, "%s was forced to reject your duel request due to not having enough %s left." % (user, config.currencyPlural))
             bot.execQueryModify("DELETE FROM duel_requests WHERE from_user = ? AND to_user = ?", (otherUserTry, user))
             return
         
         otherUserData = bot.getUserDetails(otherUserTry)
         
         if duelData["amount"] > otherUserData["balance"]:
-            bot.channelMsg("%s -> %s no longer has enough %s to participate in this duel. Rejecting it automatically..." % (user, otherUserTry, config.currencyPlural))
-            bot.channelMsg("%s -> %s was forced to reject your duel request because you no longer have enough %s left." % (otherUserTry, user, config.currencyPlural))
+            bot.addressUser(user, "%s no longer has enough %s to participate in this duel. Rejecting it automatically..." % (otherUserTry, config.currencyPlural))
+            bot.addressUser(otherUserTry, "%s was forced to reject your duel request because you no longer have enough %s left." % (user, config.currencyPlural))
             bot.execQueryModify("DELETE FROM duel_requests WHERE from_user = ? AND to_user = ?", (otherUserTry, user))
             return
         
@@ -167,7 +166,7 @@ def execute(parser, bot, user, args):
     
     elif arglist[0] == "reject":
         if len(arglist) < 2:
-            bot.channelMsg("%s -> You didn't specify a user to reject the challenge from." % user)
+            bot.addressUser(user, "You didn't specify a user to reject the challenge from.")
             return
         
         otherUserTry = arglist[1]
@@ -175,15 +174,19 @@ def execute(parser, bot, user, args):
         duelData = bot.execQuerySelectOne("SELECT * FROM duel_requests WHERE from_user = ? AND to_user = ?", (otherUserTry, user))
         
         if duelData == None:
-            bot.channelMsg("%s -> You don't have a pending challenge from %s. Use %sduel list to check your pending challenges." % (user, otherUserTry, config.cmdChar))
+            bot.addressUser(user, "You don't have a pending challenge from %s. Use %sduel list to check your pending challenges." % (otherUserTry, config.cmdChar))
             return
         
-        bot.channelMsg("%s -> %s rejected your duel request." % (otherUserTry, user))
+        bot.addressUser(otherUserTry, "%s rejected your duel request." % user)
         bot.execQueryModify("DELETE FROM duel_requests WHERE from_user = ? AND to_user = ?", (otherUserTry, user))
     
     else:
-        bot.channelMsg("%s -> See %scommands to get the list of things you can do with %sduel." % (user, config.cmdChar, config.cmdChar))
+        bot.addressUser(user, "See %scommands to get the list of things you can do with %sduel." % (config.cmdChar, config.cmdChar))
         return
         
 def requiredPerm():
     return "anyone"
+    
+def canUseByWhisper():
+    return False
+

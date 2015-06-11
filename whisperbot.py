@@ -10,12 +10,14 @@ class WhisperBot(irc.IRCClient):
     nickname = config.botNick
     password = config.botOAuth
     
-    def __init__(self, conn, cursor, lock):
+    def __init__(self, conn, cursor, lock, commandParser):
+        self.commandParser = commandParser
         self.isMod = True
         self.messageQueue = None
         self.conn = conn
         self.cursor = cursor
         self.lock = lock
+        self.channelMods = []
         
     # db stuff
     def execQueryModify(self, query, args=None):
@@ -104,18 +106,15 @@ class WhisperBot(irc.IRCClient):
     def irc_unknown(self, prefix, command, params):
         if command == "WHISPER":
             user = prefix.split('!', 1)[0]
-            args = params[1].strip().lower()
-            if args.startswith("!balance"):
-                args = args[8:].strip()
-                if not args:
-                    self.sendWhisper(user, "Your balance is %d %s." % (self.getUserDetails(user)["balance"], config.currencyPlural))
-                else:
-                    arglist = args.split()
-                    balanceCheck = self.execQuerySelectOne("SELECT * FROM users WHERE twitchname = ?", (arglist[0].lower(),))
-                    if balanceCheck == None:
-                        self.sendWhisper(user, "Your balance is %d %s." % (self.getUserDetails(user)["balance"], config.currencyPlural))
-                    else:
-                        self.sendWhisper(user, ("%s's balance is %d %s." % (balanceCheck["twitchname"], balanceCheck["balance"], config.currencyPlural)).encode("utf-8"))
+            msg = params[1].strip()
+            reactor.rootLogger.info(("%s --> %s (whisperrecv) : %s" % (user, config.botNick, msg)).decode("utf-8"))
+            if msg.startswith(config.cmdChar):
+                commandBits = msg[config.cmdCharLen:].split(' ', 1)
+                msgCommand = commandBits[0]
+                args = ""
+                if len(commandBits) == 2:
+                    args = commandBits[1]
+                self.commandParser.parse(self, user, msgCommand, args, True)
     
     def leaveChannel(self, byeMessage):
         if not self.acceptCommands:
@@ -137,18 +136,27 @@ class WhisperBot(irc.IRCClient):
         self.quit()
         
     def sendWhisper(self, user, message):
-        reactor.rootLogger.info(("%s --> %s (whisper) : %s" % (config.botNick, user, message)).decode("utf-8"))
+        reactor.rootLogger.info(("%s --> %s (whisperqueue) : %s" % (config.botNick, user, message)).decode("utf-8"))
         self.queueMsg("#jtv", "/w %s %s" % (user, message), False)
         
+    def addressUser(self, user, message):
+        self.sendWhisper(user, message)
+    
     def queueMsg(self, channel, message, repeat):
         if repeat:
             self.messageQueue.queueMessageRA(channel, message)
         else:
             self.messageQueue.queueMessage(channel, message)
+            
+    def isWhisperRequest(self):
+        return True
+        
+    def sendInfoMessage(self, id, user, message):
+        self.addressUser(user, message)
     
 class WhisperFactory(protocol.ClientFactory):
 
-    def __init__(self, waitTimeout, conn, cursor, lock):
+    def __init__(self, waitTimeout, conn, cursor, lock, commandParser):
         self.killBot = False
         self.oldWait = waitTimeout
         self.timeouts = { 0: 5, 0.1: 5, 5: 10, 10: 30, 30: 60, 60: 300, 300: 300 }
@@ -156,9 +164,11 @@ class WhisperFactory(protocol.ClientFactory):
         self.conn = conn
         self.cursor = cursor
         self.lock = lock
+        self.channel = "_DirectWhisper" # deliberate caps so it never matches a real channel
+        self.commandParser = commandParser
 
     def buildProtocol(self, addr):
-        p = WhisperBot(self.conn, self.cursor, self.lock)
+        p = WhisperBot(self.conn, self.cursor, self.lock, self.commandParser)
         p.factory = self
         reactor.whisperer = p
         return p

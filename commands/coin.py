@@ -11,7 +11,7 @@ def execute(parser, bot, user, args):
         try:
             gamble = int(args)
         except ValueError:
-            bot.channelMsg("%s -> Invalid argument." % user)
+            bot.addressUser(user, "Invalid argument.")
             return
         
         if gamble > 0 and gamble <= userData["balance"]:
@@ -25,12 +25,12 @@ def execute(parser, bot, user, args):
                 newBal += gamble
                 newProfit += gamble
                 isWinner = True
-                bot.channelMsg("%s -> Heads. +%d %s." % (user, gamble, config.currencyName if (gamble == 1) else config.currencyPlural))
+                bot.addressUser(user, "Heads. +%d %s." % (gamble, config.currencyName if (gamble == 1) else config.currencyPlural))
                 newWins += 1
             else:
                 newBal -= gamble
                 newProfit -= gamble
-                bot.channelMsg("%s -> Tails. -%d %s." % (user, gamble, config.currencyName if (gamble == 1) else config.currencyPlural))
+                bot.addressUser(user, "Tails. -%d %s." % (gamble, config.currencyName if (gamble == 1) else config.currencyPlural))
                 newLosses += 1
             
             timeNow = int(time.time())
@@ -40,9 +40,13 @@ def execute(parser, bot, user, args):
             logArgs = (user, gamble, True if gamble == userData["balance"] else False, isWinner, timeNow, bot.factory.channel)
             bot.execQueryModify("INSERT INTO coinflips (twitchname, amount, yoloflip, winner, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?)", logArgs)
         else:
-            bot.channelMsg("%s -> Not able to gamble that amount." % user)
+            bot.addressUser(user, "Not able to gamble that amount.")
     else:
         reactor.whisperer.sendWhisper(user, "On cooldown. (%d secs)" % canPlay)
     
 def requiredPerm():
     return "anyone"
+    
+def canUseByWhisper():
+    return False
+

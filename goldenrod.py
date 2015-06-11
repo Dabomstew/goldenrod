@@ -54,6 +54,7 @@ class GoldenrodNostalgiaB(irc.IRCClient):
         self.contestManager = None
         self.commandsEnabled = False
         self.contestsEnabled = False
+        self.infoSendTimes = {}
     
     # DB stuff
         
@@ -215,7 +216,7 @@ class GoldenrodNostalgiaB(irc.IRCClient):
                 args = ""
                 if len(commandBits) == 2:
                     args = commandBits[1]
-                self.commandParser.parse(self, user, command, args)
+                self.commandParser.parse(self, user, command, args, False)
     
     def leaveChannel(self, byeMessage):
         if not self.acceptCommands:
@@ -251,6 +252,20 @@ class GoldenrodNostalgiaB(irc.IRCClient):
             self.messageQueue.queueMessageRA(channel, message)
         else:
             self.messageQueue.queueMessage(channel, message)
+            
+    def addressUser(self, user, message):
+        self.channelMsg("%s -> %s" % (user, message))
+        
+    def isWhisperRequest(self):
+        return False
+        
+    def sendInfoMessage(self, id, user, message):
+        isMod = (user in self.channelMods) or user == self.factory.channel or user == config.botOwner
+        timeNow = int(time.time())
+        if isMod or (id not in self.infoSendTimes) or self.infoSendTimes[id] <= timeNow - 60:
+            self.infoSendTimes[id] = timeNow
+            self.channelMsg(message)
+        
         
 def connectToTwitch(startChannel, commandParser, waitTimeout):
     if waitTimeout > 0:
@@ -261,10 +276,10 @@ def connectToTwitch(startChannel, commandParser, waitTimeout):
     myServer = random.choice(twitchServers)
     reactor.connectTCP(myServer, 6667, f)
     
-def connectWhisperer(waitTimeout):
+def connectWhisperer(commandParser, waitTimeout):
     if waitTimeout > 0:
         time.sleep(waitTimeout)
-    f = whisperbot.WhisperFactory(waitTimeout, conn, cursor, lock)
+    f = whisperbot.WhisperFactory(waitTimeout, conn, cursor, lock, commandParser)
     # connect factory to this host and port
     twitchGroupServers = ["199.9.253.119", "199.9.253.120"]
     myServer = random.choice(twitchGroupServers)
@@ -395,7 +410,7 @@ if __name__ == '__main__':
     reactor.commandParser = commandParser
     
     connectToTwitch(config.botNick, commandParser, 0)
-    connectWhisperer(0)
+    connectWhisperer(commandParser, 0)
 
     # setup channel manager
     channelManager = channelmanager.ChannelManager(conn, cursor, lock, channelInstances)

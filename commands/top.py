@@ -13,7 +13,7 @@ def execute(parser, bot, user, args):
         topwhat = 1
     
     if topwhat > 10:
-        bot.channelMsg("%s -> For the full leaderboard go here: http://twitchbot.dabomstew.com/goldenrod/leaderboards.php?board=top" % user)
+        bot.addressUser(user, "For the full leaderboard go here: http://twitchbot.dabomstew.com/goldenrod/leaderboards.php?board=top")
         return
         
     # make sure there is a user to pick, the cheap way
@@ -22,13 +22,17 @@ def execute(parser, bot, user, args):
     # parse their choice
     if topwhat == 1:
         topPlayer = bot.execQuerySelectOne("SELECT * FROM users WHERE twitchname != ? ORDER BY balance DESC LIMIT 1", (config.botOwner,))
-        finalMessage = "%s -> The top player is %s with %d %s." % (user, topPlayer["twitchname"], topPlayer["balance"], config.currencyName if (topPlayer["balance"] == 1) else config.currencyPlural)
-        bot.channelMsg(finalMessage.encode("utf-8"))
+        finalMessage = "The top player is %s with %d %s." % (topPlayer["twitchname"], topPlayer["balance"], config.currencyName if (topPlayer["balance"] == 1) else config.currencyPlural)
+        bot.addressUser(user, finalMessage.encode("utf-8"))
     else:
         topPlayers = bot.execQuerySelectMultiple("SELECT * FROM users WHERE twitchname != ? ORDER BY balance DESC LIMIT %d" % topwhat, (config.botOwner,))
-        finalMessage = "%s -> The top %d players are: " % (user, topwhat)
+        finalMessage = "The top %d players are: " % topwhat
         finalMessage += ", ".join("%s (%d %s)" % (player["twitchname"], player["balance"], config.currencyName if (player["balance"] == 1) else config.currencyPlural) for player in topPlayers)
-        bot.channelMsg(finalMessage.encode("utf-8"))
+        bot.addressUser(user, finalMessage.encode("utf-8"))
     
 def requiredPerm():
     return "anyone"
+    
+def canUseByWhisper():
+    return True
+

@@ -7,12 +7,12 @@ def execute(parser, bot, user, args):
     try:
         sleeptime = int(args)
     except ValueError:
-        bot.channelMsg("%s -> Invalid argument." % user)
+        bot.addressUser(user, "Invalid argument.")
         return
     if sleeptime < 1 or sleeptime > 1440:
-        bot.channelMsg("%s -> Cannot silence for no time or more than 1 day. Try !nothanks instead if you want the bot gone." % user)
+        bot.addressUser(user, "Cannot silence for no time or more than 1 day. Try !nothanks instead if you want the bot gone.")
         return
-    bot.channelMsg("%s -> Commands disabled for %d minutes." % (user, sleeptime))
+    bot.addressUser(user, "Commands disabled for %d minutes." % sleeptime)
     bot.acceptCommands = False
     resThread = threading.Thread(target=returnCommands, args=(sleeptime, bot))
     resThread.daemon = True
@@ -24,3 +24,7 @@ def returnCommands(sleeptime, bot):
     
 def requiredPerm():
     return "broadcaster"
+    
+def canUseByWhisper():
+    return False
+

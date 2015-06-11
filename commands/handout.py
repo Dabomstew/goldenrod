@@ -39,7 +39,7 @@ def execute(parser, bot, user, args):
     argslow = args.lower().strip()
     
     if config.botOwner in argslow:
-        bot.channelMsg("%s -> How cute, you think begging is actually going to work." % user)
+        bot.addressUser(user, "How cute, you think begging the owner is actually going to work.")
         return
     
     saidPlease = False
@@ -74,7 +74,7 @@ def execute(parser, bot, user, args):
                 shortTermSDev = handoutsdev(diffs, 10)
                 if shortTermSDev < 1:
                     bannedUntil = timeNow + config.handoutScriptBan
-                    bot.channelMsg("%s -> You're either scripting handouts or need to ease up on the manual handout timing. Take a break from them for 1 hour." % user)
+                    bot.addressUser(user, "You're either scripting handouts or need to ease up on the manual handout timing. Take a break from them for 1 hour.")
                     bot.execQueryModify("UPDATE users SET handout_ban = ? WHERE twitchname = ?", (bannedUntil, user))
                     return
                     
@@ -82,7 +82,7 @@ def execute(parser, bot, user, args):
                 midTermSDev = handoutsdev(diffs, 30)
                 if midTermSDev < 3:
                     bannedUntil = timeNow + config.handoutScriptBan
-                    bot.channelMsg("%s -> You're either scripting handouts or need to ease up on the manual handout timing. Take a break from them for 1 hour." % user)
+                    bot.addressUser(user, "You're either scripting handouts or need to ease up on the manual handout timing. Take a break from them for 1 hour.")
                     bot.execQueryModify("UPDATE users SET handout_ban = ? WHERE twitchname = ?", (bannedUntil, user))
                     return
                     
@@ -90,7 +90,7 @@ def execute(parser, bot, user, args):
                 longTermSDev = handoutsdev(diffs, 50)
                 if longTermSDev < 8:
                     bannedUntil = timeNow + config.handoutScriptBan
-                    bot.channelMsg("%s -> You're either scripting handouts or need to ease up on the manual handout timing. Take a break from them for 1 hour." % user)
+                    bot.addressUser(user, "You're either scripting handouts or need to ease up on the manual handout timing. Take a break from them for 1 hour.")
                     bot.execQueryModify("UPDATE users SET handout_ban = ? WHERE twitchname = ?", (bannedUntil, user))
                     return
         # success
@@ -120,8 +120,7 @@ def execute(parser, bot, user, args):
         logArgs = (user, handout, timeNow, bot.factory.channel)
         bot.execQueryModify("INSERT INTO handouts (twitchname, amount, whenHappened, channel) VALUES(?, ?, ?, ?)", logArgs)
         
-        bot.channelMsg("%s -> %s" % (user, random.choice(handoutMessages)))
-
+        bot.addressUser(user, random.choice(handoutMessages))
         
         if handout > 60:
             bot.channelMsg("Congratulations %s! You should probably go buy a lottery ticket..." % user)
@@ -134,3 +133,7 @@ def execute(parser, bot, user, args):
     
 def requiredPerm():
     return "anyone"
+    
+def canUseByWhisper():
+    return False
+

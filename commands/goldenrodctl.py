@@ -10,12 +10,16 @@ def execute(parser, bot, user, args):
         argument = args.split()[0].strip().lower()
     if(argument == "off" and bot.commandsEnabled):
         bot.setCommandsEnabled(False)
-        bot.channelMsg("%s -> Goldenrod turned off. Use %sgoldenrodctl to re-enable." % (user, config.cmdChar))
+        bot.addressUser(user, "Goldenrod turned off. Use %sgoldenrodctl to re-enable." % (config.cmdChar))
     elif(argument != "off" and not bot.commandsEnabled):
         bot.setCommandsEnabled(True)
-        bot.channelMsg("%s -> Goldenrod Gaming enabled! Use %sgoldenrodctl off to turn it off when you want your chat back." % (user, config.cmdChar))
+        bot.addressUser(user, "Goldenrod Gaming enabled! Use %sgoldenrodctl off to turn it off when you want your chat back." % (config.cmdChar))
     else:
-        bot.channelMsg("%s -> Goldenrod is currently %s." % (user, "on" if bot.commandsEnabled else "off"))
+        bot.addressUser(user, "Goldenrod is currently %s." % ("on" if bot.commandsEnabled else "off"))
     
 def requiredPerm():
     return "mod"
+    
+def canUseByWhisper():
+    return False
+

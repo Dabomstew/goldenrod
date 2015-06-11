@@ -12,7 +12,11 @@ def execute(parser, bot, user, args):
     for econEntry in econTopTen:
         topsBalance = topsBalance + econEntry["balance"]
     coinData = bot.execQuerySelectOne("SELECT SUM(amount) AS allLosses FROM coinflips WHERE winner = 0")
-    bot.channelMsg("%s -> There are currently %d %s in circulation of which %d%% is held by the top 10%% of users. %d %s have been lost forever to !coin or !yolocoin." % (user, econData["allPoints"], config.currencyPlural, topsBalance*100/econData["allPoints"], coinData["allLosses"], config.currencyPlural))
+    bot.addressUser(user, "There are currently %d %s in circulation of which %d%% is held by the top 10%% of users. %d %s have been lost forever to !coin or !yolocoin." % (econData["allPoints"], config.currencyPlural, topsBalance*100/econData["allPoints"], coinData["allLosses"], config.currencyPlural))
     
 def requiredPerm():
     return "anyone"
+    
+def canUseByWhisper():
+    return True
+

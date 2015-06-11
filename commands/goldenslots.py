@@ -9,13 +9,13 @@ slotsReelTwo = ["7", "Karp", "Cherry", "Diglett", "Pika", "BAR", "Cherry", "Karp
 slotsReelThree = ["7", "Diglett", "Karp", "Cherry", "Pika", "Diglett", "Karp", "Cherry", "Pika", "Diglett", "Karp", "Cherry", "Pika", "Diglett", "BAR", "7", "Diglett", "Karp"]
 def execute(parser, bot, user, args):
     if "bot" in user:
-        bot.channelMsg("%s -> LOL nope." % user)
+        bot.addressUser(user, "LOL nope.")
         return
         
     altCheck = bot.execQuerySelectOne("SELECT * FROM alts WHERE twitchname = ?", (user,))
     
     if altCheck != None:
-        bot.channelMsg("%s -> Known alts aren't allowed to play slots." % user)
+        bot.addressUser(user, "Known alts aren't allowed to play slots.")
         return
         
     userData = bot.getUserDetails(user)
@@ -59,7 +59,7 @@ def execute(parser, bot, user, args):
                     argsListTwo = (newBal, timeNow, timeNow, user, userData["balance"])
                     bot.execQueryModify("UPDATE users SET balance = ?, last_game = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", argsListTwo)
                     bot.updateHighestBalance(userData, newBal)
-                    bot.channelMsg("%s -> %s | %s | %s - Winner! +%d %s." % (user, reelOne, reelTwo, reelThree, winnings, config.currencyPlural))
+                    bot.addressUser(user, "%s | %s | %s - Winner! +%d %s." % (reelOne, reelTwo, reelThree, winnings, config.currencyPlural))
             else:
                 winnings = -gamble
                 argsListOne = (slotsPool["slotspool"]+gamble, timeNow, slotsPool["slotspool"])
@@ -67,14 +67,18 @@ def execute(parser, bot, user, args):
                     newBal = newBal - gamble
                     argsListTwo = (newBal, timeNow, timeNow, user, userData["balance"])
                     bot.execQueryModify("UPDATE users SET balance = ?, last_game = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", argsListTwo)
-                    bot.channelMsg("%s -> %s | %s | %s - Not this time! -%d %s." % (user, reelOne, reelTwo, reelThree, gamble, config.currencyName if (gamble == 1) else config.currencyPlural))
+                    bot.addressUser(user, "%s | %s | %s - Not this time! -%d %s." % (reelOne, reelTwo, reelThree, gamble, config.currencyName if (gamble == 1) else config.currencyPlural))
             
             logArgs = (user, reelOne, reelTwo, reelThree, True if (reelOne==reelTwo and reelOne==reelThree) else False, winnings, timeNow, bot.factory.channel)
             bot.execQueryModify("INSERT INTO slots (twitchname, reelOne, reelTwo, reelThree, winner, balChange, whenHappened, channel) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", logArgs)
         else:
-            bot.channelMsg("%s -> The slots cost 5 %s to play, you don't have enough." % (user, config.currencyPlural))
+            bot.addressUser(user, "The slots cost 5 %s to play, you don't have enough." % config.currencyPlural)
     else:
         reactor.whisperer.sendWhisper(user, "On cooldown. (%d secs)" % canPlay)
     
 def requiredPerm():
     return "anyone"
+    
+def canUseByWhisper():
+    return False
+

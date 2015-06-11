@@ -6,8 +6,13 @@ def execute(parser, bot, user, args):
         return
     bot.contestsEnabled = True
     bot.contestManager.startNextContest = int(time.time())-1
-    bot.channelMsg("%s -> One contest, coming right up." % (user))
+    bot.addressUser(user, "One contest, coming right up.")
     
 def requiredPerm():
     return "owner"
+    
+def canUseByWhisper():
+    return False
+
+
     

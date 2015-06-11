@@ -12,8 +12,12 @@ def execute(parser, bot, user, args):
     
     otherUserTry = arglist[0].lower()
     
-    bot.execQueryModify("INSERT OR IGNORE INTO alts (twitchname, whenHappened) VALUES(?, ?)", (otherUserTry,int(time.time())))
-    bot.channelMsg("%s -> Flagged %s as an alt, they are no longer allowed to donate." % (user, otherUserTry))
+    bot.execQueryModify("INSERT OR IGNORE INTO alts (twitchname, whenHappened) VALUES(?, ?)", (otherUserTry, int(time.time())))
+    bot.addressUser(user, "Flagged %s as an alt, they are no longer allowed to donate." % otherUserTry)
     
 def requiredPerm():
     return "owner"
+    
+def canUseByWhisper():
+    return True
+
