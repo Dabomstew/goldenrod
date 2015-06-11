@@ -120,10 +120,8 @@ def execute(parser, bot, user, args):
         logArgs = (user, handout, timeNow, bot.factory.channel)
         bot.execQueryModify("INSERT INTO handouts (twitchname, amount, whenHappened, channel) VALUES(?, ?, ?, ?)", logArgs)
         
-        if handout > 20 or handout == 0:
-            bot.channelMsg("%s -> %s" % (user, random.choice(handoutMessages)))
-        else:
-            reactor.whisperer.sendWhisper(user, random.choice(handoutMessages))
+        bot.channelMsg("%s -> %s" % (user, random.choice(handoutMessages)))
+
         
         if handout > 60:
             bot.channelMsg("Congratulations %s! You should probably go buy a lottery ticket..." % user)
