@@ -280,11 +280,14 @@ class GoldenrodNostalgiaB(irc.IRCClient):
         return False
         
     def sendInfoMessage(self, id, user, message):
-        isMod = (user in self.channelMods) or user == self.factory.channel or user == config.botOwner
-        timeNow = int(time.time())
-        if isMod or (id not in self.infoSendTimes) or self.infoSendTimes[id] <= timeNow - 60:
-            self.infoSendTimes[id] = timeNow
-            self.channelMsg(message)
+        if self.inQuietMode:
+            reactor.whisperer.sendWhisper(user, message)
+        else:
+            isMod = (user in self.channelMods) or user == self.factory.channel or user == config.botOwner
+            timeNow = int(time.time())
+            if isMod or (id not in self.infoSendTimes) or self.infoSendTimes[id] <= timeNow - 60:
+                self.infoSendTimes[id] = timeNow
+                self.channelMsg(message)
             
     def tellAboutQuietMode(self, user):
         if user not in self.quietModeTold:

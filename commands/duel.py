@@ -5,6 +5,10 @@ import math
 from twisted.internet import reactor
 
 def execute(parser, bot, user, args):
+    if bot.inQuietMode:
+        bot.tellAboutQuietMode(user)
+        return
+        
     if "bot" in user:
         bot.addressUser(user, "LOL nope.")
         return
