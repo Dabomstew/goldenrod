@@ -271,7 +271,10 @@ class GoldenrodNostalgiaB(irc.IRCClient):
             self.messageQueue.queueMessage(channel, message)
             
     def addressUser(self, user, message):
-        self.channelMsg("%s -> %s" % (user, message))
+        if self.inQuietMode:
+            reactor.whisperer.sendWhisper(user, message)
+        else:
+            self.channelMsg("%s -> %s" % (user, message))
         
     def isWhisperRequest(self):
         return False

@@ -23,11 +23,11 @@ def execute(parser, bot, user, args):
     else:
         if bot.commandsEnabled:
             if bot.inQuietMode:
-                bot.addressUser(user, "Goldenrod is currently on in quiet mode.")
+                bot.addressUser(user, "Goldenrod is currently on in quiet mode. (usage: !goldenrodctl on/quiet/off)")
             else:
-                bot.addressUser(user, "Goldenrod is currently on in normal mode.")
+                bot.addressUser(user, "Goldenrod is currently on in normal mode. (usage: !goldenrodctl on/quiet/off)")
         else:
-            bot.addressUser(user, "Goldenrod is currently off.")
+            bot.addressUser(user, "Goldenrod is currently off. (usage: !goldenrodctl on/quiet/off)")
     
 def requiredPerm():
     return "mod"
