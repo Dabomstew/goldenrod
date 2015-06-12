@@ -114,10 +114,19 @@ def execute(parser, bot, user, args):
     
     saidPlease = False
     words = argslow.split()
+    magicword = None
     if len(words) >= 1:
+        magicword = words[0]
         for keyword in config.magicWords:
             if keyword == words[0]:
                 saidPlease = True
+        
+    if not magicword:
+        magicword = None
+    else:
+        magicword = magicword.decode("utf-8")
+        if len(magicword) > 32:
+            magicword = magicword[0:32]   
 
     userData = bot.getUserDetails(user)
     
@@ -196,8 +205,8 @@ def execute(parser, bot, user, args):
         queryArgs = (userData["balance"]+handout, timeNow, timeNow, newHighest, user, userData["balance"])
         bot.execQueryModify("UPDATE users SET balance = ?, last_game = ?, last_activity = ?, handouts = handouts + 1, highest_handout = ? WHERE twitchname = ? AND balance = ?", queryArgs)
         bot.updateHighestBalance(userData, userData["balance"]+handout)
-        logArgs = (user, handout, timeNow, bot.factory.channel)
-        bot.execQueryModify("INSERT INTO handouts (twitchname, amount, whenHappened, channel) VALUES(?, ?, ?, ?)", logArgs)
+        logArgs = (user, handout, timeNow, bot.factory.channel, magicword)
+        bot.execQueryModify("INSERT INTO handouts (twitchname, amount, whenHappened, channel, magicWord) VALUES(?, ?, ?, ?, ?)", logArgs)
         
         bot.addressUser(user, random.choice(handoutMessages))
         
