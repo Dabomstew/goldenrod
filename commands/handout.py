@@ -5,6 +5,7 @@ import random
 import datetime, time
 import math
 from twisted.internet import reactor
+from collections import OrderedDict
 
 def thinpurgeise(str):
     universion = str.decode('utf-8')
@@ -20,6 +21,75 @@ def thinpurgeise(str):
         newstr += unichr(cnum)
         ind += 1
     return newstr.encode('utf-8')
+    
+def romannumerals(number):
+    if number >= 1 and number <= 12:
+        return unichr(0x215F + number).encode("utf-8")
+        
+    romanrep = ""
+    
+    numthousands = number / 1000
+    number %= 1000
+    romanrep += "M"*numthousands
+    
+    if number >= 900:
+        number -= 900
+        romanrep += "CM"
+    elif number >= 500:
+        numhundreds = (number-500)/100
+        number %= 100
+        romanrep += "D" + ("C" * numhundreds)
+    elif number >= 400:
+        number -= 400
+        romanrep += "CD"
+    elif number >= 100:
+        numhundreds = number/100
+        number %= 100
+        romanrep += "C" * numhundreds
+        
+    if number >= 90:
+        number -= 90
+        romanrep += "XC"
+    elif number >= 50:
+        numtens = (number-50)/10
+        number %= 10
+        romanrep += "L" + ("X" * numtens)
+    elif number >= 40:
+        number -= 40
+        romanrep += "XL"
+    elif number >= 10:
+        numtens = number/10
+        number %= 10
+        romanrep += "X" * numtens
+        
+    if number >= 9:
+        romanrep += "IX"
+    elif number >= 5:
+        numones = number-5
+        romanrep += "V" + ("I" * numones)
+    elif number >= 4:
+        romanrep += "IV"
+    elif number >= 1:
+        romanrep += "I" * number
+        
+    return thinpurgeise(romanrep)
+    
+def circlenumber(number):
+    if number >= 1 and number <= 20:
+        return unichr(0x245F + number).encode("utf-8")
+        
+    circlerep = ""
+    decplace = 1
+    
+    while number >= decplace:
+        thisplace = (number / decplace) % (decplace * 10)
+        if thisplace == 0:
+            circlerep = unichr(0x24EA).encode("utf-8") + circlerep
+        else:
+            circlerep = unichr(thisplace+0x245F).encode("utf-8") + circlerep
+        decplace *= 10
+    
+    return circlerep
     
 def handoutsdev(diffs, number):
     meantotal = 0
@@ -118,7 +188,7 @@ def execute(parser, bot, user, args):
             handout = 0
             handoutMessages = ["Error 404, points not found. Perhaps next time?", "Oops, I slipped and dropped my wallet full of points so I can't help you. Try again later.", "SYSTEM used PAY DAY! SYSTEM's attack missed!"]
         elif userData["balance"] > 0:
-            handoutMessages = ["Here, take %d %s." % (handout, currencyNow), "If I give you %d %s will you leave me alone?" % (handout, currencyNow), "Fine. %d %s for you. Now shoo!" % (handout, currencyNow), "I'm actually feeling pretty generous today, so have %d %s." % (handout, currencyNow), "I-It's not like I wanted to give you %d %s or anything! B-Baka!" % (handout, currencyNow), "I present %d %s to Mr. Beggar Extraordinaire over here." % (handout, currencyNow), "I present %d %s to Ms. Beggar Extraordinaire over here." % (handout, currencyNow), "The Goldenrod Gods have spoken. Thou shalt receive %d %s." % (handout, currencyNow), "The hammer has deemed you not worthy. Here is your consolation prize of %d %s." % (handout, currencyNow), "I'll allow you to take %d %s off my hands if you promise not to tell anyone." % (handout, currencyNow), "%s grew to level %d! %s gained %d %s!" % (user, userData["handouts"]+1, user, handout, currencyNow), thinpurgeise("Up Down Left Right %d %s A B Start Select" % (handout, currencyNow)), "You just passed GO! Take %d %s." % (handout, currencyNow), "On coold- HEY! What's the meaning of stealing %d %s from me? Oh well, I may as well let you have them...ᴡᴀᴛᴄʜ ʏᴏᴜʀ ʙᴀᴄᴋ..." % (handout, currencyNow)]
+            handoutMessages = ["Here, take %s %s." % (romannumerals(handout), currencyNow), "If I give you %d %s will you leave me alone?" % (handout, currencyNow), "Fine. %d %s for you. Now shoo!" % (handout, currencyNow), "I'm actually feeling pretty generous today, so have %d %s." % (handout, currencyNow), "I-It's not like I wanted to give you %d %s or anything! B-Baka!" % (handout, currencyNow), "I present %d %s to Mr. Beggar Extraordinaire over here." % (handout, currencyNow), "I present %d %s to Ms. Beggar Extraordinaire over here." % (handout, currencyNow), "The Goldenrod Gods have spoken. Thou shalt receive %s %s." % (circlenumber(handout), currencyNow), "The hammer has deemed you not worthy. Here is your consolation prize of %d %s." % (handout, currencyNow), "I'll allow you to take %d %s off my hands if you promise not to tell anyone." % (handout, currencyNow), "%s grew to level %d! %s gained %d %s!" % (user, userData["handouts"]+1, user, handout, currencyNow), thinpurgeise("Up Down Left Right %d %s A B Start Select" % (handout, currencyNow)), "You just passed GO! Take %d %s." % (handout, currencyNow), "On coold- HEY! What's the meaning of stealing %d %s from me? Oh well, I may as well let you have them...ᴡᴀᴛᴄʜ ʏᴏᴜʀ ʙᴀᴄᴋ..." % (handout, currencyNow)]
         else:
             handoutMessages = ["You irresponsible gambler, how dare you waste my generosity. But I feel obligated to get you back on your feet again, so here's %d %s." % (handout, currencyNow), "Another yolocoiner? The line's over there... Fine, have %d %s but get out of my sight." % (handout, currencyNow)]
             
