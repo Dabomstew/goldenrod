@@ -8,6 +8,10 @@ slotsReelOne = ["7", "Pika", "Karp", "BAR", "Cherry", "7", "Karp", "Diglett", "B
 slotsReelTwo = ["7", "Karp", "Cherry", "Diglett", "Pika", "BAR", "Cherry", "Karp", "Diglett", "Cherry", "BAR", "Karp", "Diglett", "Cherry", "Pika", "7", "Karp", "Cherry"]
 slotsReelThree = ["7", "Diglett", "Karp", "Cherry", "Pika", "Diglett", "Karp", "Cherry", "Pika", "Diglett", "Karp", "Cherry", "Pika", "Diglett", "BAR", "7", "Diglett", "Karp"]
 def execute(parser, bot, user, args):
+    if bot.inQuietMode:
+        bot.tellAboutQuietMode(user)
+        return
+        
     if "bot" in user:
         bot.addressUser(user, "LOL nope.")
         return

@@ -103,6 +103,10 @@ def handoutsdev(diffs, number):
     return sdev
     
 def execute(parser, bot, user, args):
+    if bot.inQuietMode:
+        bot.tellAboutQuietMode(user)
+        return
+        
     argslow = args.lower().strip()
     
     if config.botOwner in argslow:

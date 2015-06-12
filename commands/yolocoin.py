@@ -4,6 +4,10 @@ import datetime, time
 from twisted.internet import reactor
 
 def execute(parser, bot, user, args):
+    if bot.inQuietMode:
+        bot.tellAboutQuietMode(user)
+        return
+        
     userData = bot.getUserDetails(user)
     canPlay = bot.canPlayGame(userData)
     if canPlay == 0:

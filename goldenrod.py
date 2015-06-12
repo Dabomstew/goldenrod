@@ -54,7 +54,9 @@ class GoldenrodNostalgiaB(irc.IRCClient):
         self.contestManager = None
         self.commandsEnabled = False
         self.contestsEnabled = False
+        self.inQuietMode = False
         self.infoSendTimes = {}
+        self.quietModeTold = []
     
     # DB stuff
         
@@ -117,7 +119,7 @@ class GoldenrodNostalgiaB(irc.IRCClient):
     def commandsAreEnabled(self):
         commandInfo = self.execQuerySelectOne("SELECT * FROM channels WHERE channel = ?", (self.factory.channel,))
         if commandInfo == None:
-            self.execQueryModify("INSERT INTO channels (channel, commandsEnabled, lastChange) VALUES(?, ?, ?)", (self.factory.channel, False, int(time.time())))
+            self.execQueryModify("INSERT INTO channels (channel, commandsEnabled, quietMode, lastChange) VALUES(?, ?, ?)", (self.factory.channel, False, False, int(time.time())))
             commandInfo = self.execQuerySelectOne("SELECT * FROM channels WHERE channel = ?", (self.factory.channel,))
             
         return commandInfo["commandsEnabled"]
@@ -125,6 +127,19 @@ class GoldenrodNostalgiaB(irc.IRCClient):
     def setCommandsEnabled(self, commandsEnabled):
         self.commandsEnabled = commandsEnabled
         self.execQueryModify("UPDATE channels SET commandsEnabled = ?, lastChange = ? WHERE channel = ?", (commandsEnabled, int(time.time()), self.factory.channel))
+        
+    def isInQuietMode(self):
+        commandInfo = self.execQuerySelectOne("SELECT * FROM channels WHERE channel = ?", (self.factory.channel,))
+        if commandInfo == None:
+            self.execQueryModify("INSERT INTO channels (channel, commandsEnabled, quietMode, lastChange) VALUES(?, ?, ?)", (self.factory.channel, False, False, int(time.time())))
+            commandInfo = self.execQuerySelectOne("SELECT * FROM channels WHERE channel = ?", (self.factory.channel,))
+            
+        return commandInfo["quietMode"]
+        
+    def setQuietMode(self, quietMode):
+        self.inQuietMode = quietMode
+        self.execQueryModify("UPDATE channels SET quietMode = ?, lastChange = ? WHERE channel = ?", (quietMode, int(time.time()), self.factory.channel))
+        self.quietModeTold = []
             
     # return 0 if they can play or cooldown in seconds remaining otherwise
     def canPlayGame(self, userData):
@@ -165,6 +180,8 @@ class GoldenrodNostalgiaB(irc.IRCClient):
     def joined(self, channel):
         """This will get called when the bot joins the channel."""
         self.commandsEnabled = self.commandsAreEnabled()
+        self.inQuietMode = self.isInQuietMode()
+        self.quietModeTold = []
         self.acceptCommands = True
         self.isMod = (config.botNick == self.factory.channel)
         self.channelMods = []
@@ -265,6 +282,11 @@ class GoldenrodNostalgiaB(irc.IRCClient):
         if isMod or (id not in self.infoSendTimes) or self.infoSendTimes[id] <= timeNow - 60:
             self.infoSendTimes[id] = timeNow
             self.channelMsg(message)
+            
+    def tellAboutQuietMode(self, user):
+        if user not in self.quietModeTold:
+            self.quietModeTold.append(user)
+            reactor.whisperer.sendWhisper(user, "This stream is currently in quiet mode, spammy commands like !handout are turned off. Please respect the streamer's wishes and keep the spam low.")
         
         
 def connectToTwitch(startChannel, commandParser, waitTimeout):
