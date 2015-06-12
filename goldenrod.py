@@ -119,7 +119,7 @@ class GoldenrodNostalgiaB(irc.IRCClient):
     def commandsAreEnabled(self):
         commandInfo = self.execQuerySelectOne("SELECT * FROM channels WHERE channel = ?", (self.factory.channel,))
         if commandInfo == None:
-            self.execQueryModify("INSERT INTO channels (channel, commandsEnabled, quietMode, lastChange) VALUES(?, ?, ?)", (self.factory.channel, False, False, int(time.time())))
+            self.execQueryModify("INSERT INTO channels (channel, commandsEnabled, quietMode, lastChange) VALUES(?, ?, ?, ?)", (self.factory.channel, False, False, int(time.time())))
             commandInfo = self.execQuerySelectOne("SELECT * FROM channels WHERE channel = ?", (self.factory.channel,))
             
         return commandInfo["commandsEnabled"]
@@ -131,7 +131,7 @@ class GoldenrodNostalgiaB(irc.IRCClient):
     def isInQuietMode(self):
         commandInfo = self.execQuerySelectOne("SELECT * FROM channels WHERE channel = ?", (self.factory.channel,))
         if commandInfo == None:
-            self.execQueryModify("INSERT INTO channels (channel, commandsEnabled, quietMode, lastChange) VALUES(?, ?, ?)", (self.factory.channel, False, False, int(time.time())))
+            self.execQueryModify("INSERT INTO channels (channel, commandsEnabled, quietMode, lastChange) VALUES(?, ?, ?, ?)", (self.factory.channel, False, False, int(time.time())))
             commandInfo = self.execQuerySelectOne("SELECT * FROM channels WHERE channel = ?", (self.factory.channel,))
             
         return commandInfo["quietMode"]
