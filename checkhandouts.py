@@ -4,10 +4,10 @@ import random
 
 handoutbal = 0
 maxho = 0
-genwunmisses = 0
 saidPlease = False
+freq = {}
 
-for i in xrange(1, 1000001):
+for i in xrange(1, 10000001):
     handout = 0
     while True:
         doContinue = False
@@ -29,10 +29,15 @@ for i in xrange(1, 1000001):
             
     if random.randint(1,256) == 256:
         handout = 0
-        genwunmisses += 1
+        
+    if handout in freq:
+        freq[handout] += 1
+    else:
+        freq[handout] = 1
+        
     handoutbal = handoutbal + handout
     maxho = max(maxho, handout)
             
 print handoutbal
 print maxho
-print genwunmisses
+print freq
