@@ -193,8 +193,8 @@ class GoldenrodNostalgiaB(irc.IRCClient):
             
         # Otherwise check to see if it is a potential command
         msg = msg.strip()
-        if (self.commandsEnabled or (user == self.factory.channel or user == config.botOwner)) and self.acceptCommands:
-            if not self.commandsEnabled and user == self.factory.channel and user != config.botOwner:
+        if (self.commandsEnabled or (user == self.factory.channel or user == config.botOwner or user in self.channelMods)) and self.acceptCommands:
+            if not self.commandsEnabled and (user == self.factory.channel or user in self.channelMods) and user != config.botOwner:
                 if not msg.startswith("%sgoldenrodctl" % config.cmdChar):
                     return
             if random.randint(1, 8192) == 6969:
