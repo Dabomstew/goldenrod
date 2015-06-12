@@ -2,7 +2,7 @@ from twisted.internet import reactor
 import config
 
 def execute(parser, bot, user, args):
-    if not parser.checkPerms(bot, user, "broadcaster") and not parser.checkPerms(bot, user, "owner"):
+    if not parser.checkPerms(bot, user, "mod"):
         return
     if not args:
         argument = ""
