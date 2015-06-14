@@ -4,6 +4,7 @@ import random
 import config
 import datetime, time
 import math
+from twisted.internet import reactor
 
 class Game:
 
@@ -17,7 +18,7 @@ class Game:
         self.number = random.randint(config.highlowMinNumber, config.highlowMaxNumber)
         print self.number
         msgArgs = (config.highlowMinNumber, config.highlowMaxNumber, config.highlowGuessTimeout, config.highlowPrize, config.currencyPlural, config.contestDurations["highlow"])
-        self.bot.channelMsg("High/Low! I have chosen a random number between %d and %d. Have a go at guessing the number in a message and I'll tell you whether your guess was too high or too low. You can guess once every %d seconds. The winner gets %d %s and you have %d seconds. Good luck!" % msgArgs)
+        self.bot.channelMsg("High/Low! I have chosen a random number between %d and %d. Have a go at guessing the number in a message and I'll whisper you whether your guess was too high or too low. You can guess once every %d seconds. The winner gets %d %s and you have %d seconds. Good luck!" % msgArgs)
         
     def processMessage(self, user, message):
         if message:
@@ -32,17 +33,17 @@ class Game:
                     return
                     
                 if "bot" in user:
-                    self.bot.channelMsg("%s -> LOL nope." % user)
+                    reactor.whisperer.sendWhisper(user, "LOL nope.")
                     return
                     
                 altCheck = self.bot.execQuerySelectOne("SELECT * FROM alts WHERE twitchname = ?", (user,))
                 
                 if altCheck != None:
-                    self.bot.channelMsg("%s -> Known alts aren't allowed to play games." % user)
+                    reactor.whisperer.sendWhisper(user, "Known alts aren't allowed to play games.")
                     return
                 
                 if user in self.guessers and self.guessers[user] > timeNow - config.highlowGuessTimeout:
-                    self.bot.channelMsg("%s -> Stop spamming guesses." % user)
+                    reactor.whisperer.sendWhisper(user, "Stop spamming guesses.")
                     return
                 
                 self.guessers[user] = timeNow
@@ -64,9 +65,9 @@ class Game:
                     return
                 else:
                     if self.number > numberguess:
-                        self.bot.channelMsg("%s -> %d is too low." % (user, numberguess))
+                        reactor.whisperer.sendWhisper(user, "%d is too low." % (numberguess))
                     else:
-                        self.bot.channelMsg("%s -> %d is too high." % (user, numberguess))
+                        reactor.whisperer.sendWhisper(user, "%d is too high." % (numberguess))
             except ValueError:
                 return
     
