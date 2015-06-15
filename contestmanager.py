@@ -60,7 +60,8 @@ class ContestManager:
     def startAContest(self):
         chosen = random.randint(1, 100)
         cumuProb = 0
-        for contestEntry in config.contestChoiceWeightings:
+        weightings = config.contestChoiceWeightingsQuiet if self.bot.inQuietMode else config.contestChoiceWeightings
+        for contestEntry in weightings:
             contestName = contestEntry[0]
             contestProb = contestEntry[1]
             if chosen > cumuProb and chosen <= cumuProb + contestProb:
