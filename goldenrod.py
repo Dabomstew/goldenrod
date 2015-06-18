@@ -57,6 +57,7 @@ class GoldenrodNostalgiaB(irc.IRCClient):
         self.inQuietMode = False
         self.infoSendTimes = {}
         self.quietModeTold = []
+        self.shinyMessageTimes = {}
     
     # DB stuff
         
@@ -214,16 +215,19 @@ class GoldenrodNostalgiaB(irc.IRCClient):
             if not self.commandsEnabled and (user == self.factory.channel or user in self.channelMods) and user != config.botOwner:
                 if not msg.startswith("%sgoldenrodctl" % config.cmdChar):
                     return
-            if random.randint(1, 8192) == 6969:
-                self.channelMsg("/me *** %s's MESSAGE WAS SHINIED! THEY WIN %d %s. ***" % (user.upper(), config.shinyPrize, config.currencyPlural.upper()))
-                userData = self.getUserDetails(user)
-                self.execQueryModify("INSERT INTO shinies (twitchname, reward, whenHappened, channel) VALUES(?, ?, ?, ?)", (user, config.shinyPrize, int(time.time()), self.factory.channel))
-                self.execQueryModify("UPDATE users SET balance = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", (userData["balance"]+config.shinyPrize, int(time.time()), user, userData["balance"]))
-                if user == self.factory.channel:
-                    self.channelMsg("/me Strimmer got a shiny? DansGame R I G G E D DansGame")
-                
-                if user == config.botOwner:
-                    self.channelMsg("/me The owner got a shiny? DansGame DansGame DansGame 1 0 0 % R I G G E D DansGame DansGame DansGame")
+            timeNow = int(time.time())
+            if (user not in self.shinyMessageTimes) or self.shinyMessageTimes[user] <= timeNow - 60:
+                self.shinyMessageTimes[user] = timeNow
+                if random.randint(1, 8192) == 6969:
+                    self.channelMsg("/me *** %s's MESSAGE WAS SHINIED! THEY WIN %d %s. ***" % (user.upper(), config.shinyPrize, config.currencyPlural.upper()))
+                    userData = self.getUserDetails(user)
+                    self.execQueryModify("INSERT INTO shinies (twitchname, reward, whenHappened, channel) VALUES(?, ?, ?, ?)", (user, config.shinyPrize, int(time.time()), self.factory.channel))
+                    self.execQueryModify("UPDATE users SET balance = ?, last_activity = ? WHERE twitchname = ? AND balance = ?", (userData["balance"]+config.shinyPrize, int(time.time()), user, userData["balance"]))
+                    if user == self.factory.channel:
+                        self.channelMsg("/me Strimmer got a shiny? DansGame R I G G E D DansGame")
+                    
+                    if user == config.botOwner:
+                        self.channelMsg("/me The owner got a shiny? DansGame DansGame DansGame 1 0 0 % R I G G E D DansGame DansGame DansGame")
             
             if self.contestManager.currentContest != None:
                 self.contestManager.currentContest.processMessage(user, msg)
