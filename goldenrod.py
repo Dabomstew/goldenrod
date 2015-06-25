@@ -162,6 +162,7 @@ class GoldenrodNostalgiaB(irc.IRCClient):
         
     def signedOn(self):
         """Called when bot has succesfully signed on to server."""
+        self.sendLine("CAP REQ :twitch.tv/commands")
         self.join(self.factory.channel)
         self.acceptCommands = False
         self.isMod = (config.botNick == self.factory.channel)
@@ -200,16 +201,8 @@ class GoldenrodNostalgiaB(irc.IRCClient):
         user = user.split('!', 1)[0]
         
         reactor.rootLogger.info(("%s --> %s : %s" % (user, channel, msg)).decode("utf-8"))
-        # Check to see if they're sending me a private message
-        if channel == self.nickname:
-            if user == "jtv":
-                if msg.startswith(config.twitchModsMsg):
-                    self.channelMods = msg[len(config.twitchModsMsg):].split(", ")
-                    self.isMod = (self.nickname in self.channelMods) or (self.nickname == self.factory.channel)
-                    
-            return
             
-        # Otherwise check to see if it is a potential command
+        # Check to see if it is a potential command
         msg = msg.strip()
         if (self.commandsEnabled or (user == self.factory.channel or user == config.botOwner or user in self.channelMods)) and self.acceptCommands:
             if not self.commandsEnabled and (user == self.factory.channel or user in self.channelMods) and user != config.botOwner:
@@ -238,6 +231,14 @@ class GoldenrodNostalgiaB(irc.IRCClient):
                 if len(commandBits) == 2:
                     args = commandBits[1]
                 self.commandParser.parse(self, user, command, args, False)
+                
+    def noticed(self, user, channel, msg):
+        reactor.rootLogger.info(("%s --> (notice) %s : %s" % (user, channel, msg)).decode("utf-8"))
+        
+        # Check to see if they're sending me a private message
+        if user == "tmi.twitch.tv" and msg.startswith(config.twitchModsMsg):
+            self.channelMods = msg[len(config.twitchModsMsg):].split(", ")
+            self.isMod = (self.nickname in self.channelMods) or (self.nickname == self.factory.channel)
     
     def leaveChannel(self, byeMessage):
         if not self.acceptCommands:
