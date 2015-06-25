@@ -314,7 +314,7 @@ def connectWhisperer(commandParser, waitTimeout):
         time.sleep(waitTimeout)
     f = whisperbot.WhisperFactory(waitTimeout, conn, cursor, lock, commandParser)
     # connect factory to this host and port
-    twitchGroupServers = ["199.9.253.119", "199.9.253.120"]
+    twitchGroupServers = ["199.9.253.120"]
     myServer = random.choice(twitchGroupServers)
     reactor.connectTCP(myServer, 6667, f)
     
