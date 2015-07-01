@@ -53,6 +53,10 @@ class Game:
                 
             arglist = initialmsg.strip().split()
             if len(arglist) >= 2 and arglist[0].lower() == guessme:
+                if user in self.fullGuesses:
+                    # banned already
+                    return
+                    
                 if "bot" in user:
                     self.bot.channelMsg("%s -> LOL nope." % user)
                     return
@@ -82,9 +86,6 @@ class Game:
                                 return
                                 
                 if(len(arglist[1]) == len(self.word)):
-                    if user in self.fullGuesses:
-                        # banned already
-                        return
                     lowerword = arglist[1].lower()
                     if(lowerword == self.word):
                         # woo they won
